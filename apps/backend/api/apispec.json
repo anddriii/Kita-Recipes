@@ -1,0 +1,1086 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "Kita Recipes API",
+        "version": "1.0.0",
+        "description": "API for Kita Recipes"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:3000"
+        }
+    ],
+    "paths": {
+        "/categories": {
+            "get":{
+                "tags": ["Category API"],
+                "description": "List All Categories",
+                "summary": "List All Categories",
+                "responses": {
+                    "200":{
+                        "description": "Succes get all Categories",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type": "object",
+                                    "properties": {
+                                        "code":{
+                                            "type": "number"
+                                        },
+                                        "status":{
+                                            "type": "string"
+                                        },
+                                        "data":{
+                                            "type": "array",
+                                            "items":{
+                                                "$ref": "#/components/schemas/Categories"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post":{
+                "tags": ["Category API"],
+                "summary": "Post Category",
+                "description": "Post Category",
+                "responses": {
+                    "200":{
+                        "description": "Succes add Category",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type": "object",
+                                    "properties": {
+                                        "code":{
+                                            "type": "number"
+                                        },
+                                        "status":{
+                                            "type": "string"
+                                        },
+                                        "data":{
+                                            "$ref": "#/components/schemas/CreateOrUpdateCategory"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/categories/{categorySlug}":{
+            "get":{
+                "tags":["Category API"],
+                "description": "Get Categories by id",
+                "summary": "get Categories by id",
+                "parameters": [
+                    {
+                        "name" : "categorySlug",
+                        "in" : "path",
+                        "description": "Category Slug",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200":{
+                        "description": "Succes get Category",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type": "object",
+                                    "properties": {
+                                        "code":{
+                                            "type": "number"
+                                        },
+                                        "status":{
+                                            "type": "string"
+                                        },
+                                        "data":{
+                                            "$ref" : "#/components/schemas/CategoryById"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put":{
+                "tags":["Category API"],
+                "description": "update Categories by Slug",
+                "summary": "update Categories by Slug",
+                "parameters": [
+                    {
+                        "name" : "categorySlug",
+                        "in" : "path",
+                        "description": "Category Slug"
+                    }
+                ],
+                "requestBody":{
+                    "content": {
+                        "application/json":{
+                            "schema":{
+                                "$ref": "#/components/schemas/CreateOrUpdateCategory"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200" :{
+                        "description": "Succes Update Category",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type": "object",
+                                    "properties": {
+                                        "code":{
+                                            "type": "number"
+                                        },
+                                        "status":{
+                                            "type": "string"
+                                        },
+                                        "data":{
+                                            "$ref" : "#/components/schemas/Categories"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete":{
+                "tags":["Category API"],
+                "description": "delete Category by id",
+                "summary": "delete Category by id",
+                "parameters": [
+                    {
+                        "name" : "categoryId",
+                        "in" : "path",
+                        "description": "Category Id"
+                    }
+                ],
+                "responses": {
+                    "200" :{
+                        "description": "Succes Delete Category",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type": "object",
+                                    "properties": {
+                                        "code":{
+                                            "type": "number"
+                                        },
+                                        "status":{
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }, 
+        "/ingredients":{
+            "get":{
+                "tags": ["Ingredients API"],
+                "summary": "List all ingredients",
+                "description": "List all ingredients",
+                "responses": {
+                    "200":{
+                        "description": "Succes get all Ingredients",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type": "object",
+                                    "properties": {
+                                        "code":{
+                                            "type": "number"
+                                        },
+                                        "status":{
+                                            "type": "string"
+                                        },
+                                        "data":{
+                                            "type": "array",
+                                            "items":{
+                                                "$ref": "#/components/schemas/Ingredients"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post":{
+                "tags": ["Ingredients API"],
+                "summary": "POST Ingredients",
+                "description": "Post Ingredients",
+                "responses": {
+                    "200":{
+                        "description": "Succes Add Ingredients",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type": "object",
+                                    "properties": {
+                                        "code":{
+                                            "type": "number"
+                                        },
+                                        "status":{
+                                            "type": "string"
+                                        },
+                                        "data":{
+                                            "$ref": "#/components/schemas/CreateOrUpdateIngredients"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/ingredient/{ingredientId}":{
+            "get":{
+                "tags":["Ingredients API"],
+                "description": "Get Ingredient by id",
+                "summary": "get Ingredient by id",
+                "parameters": [
+                    {
+                        "name" : "ingredientId",
+                        "in" : "path",
+                        "description": "Ingredient Id"
+                    }
+                ],
+                "responses": {
+                    "200":{
+                        "description": "Succes get Ingredient",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type": "object",
+                                    "properties": {
+                                        "code":{
+                                            "type": "number"
+                                        },
+                                        "status":{
+                                            "type": "string"
+                                        },
+                                        "data":{
+                                            "$ref" : "#/components/schemas/Ingredients"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put":{
+                "tags": ["Ingredients API"],
+                "summary": "Update Ingredient",
+                "description": "Update Ingredient by Id",
+                "parameters": [{
+                    "name" : "ingredientId",
+                    "in" : "path",
+                    "description": "Ingredient Id"
+                }],
+                "requestBody":{
+                    "content": {
+                        "application/json":{
+                            "schema":{
+                                "$ref": "#/components/schemas/CreateOrUpdateIngredients"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200":{
+                        "description": "Succes update ingredient",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type": "object",
+                                    "properties": {
+                                        "code":{
+                                            "type": "number"
+                                        },
+                                        "status":{
+                                            "type": "string"
+                                        },
+                                        "data":{
+                                            "$ref" : "#/components/schemas/Ingredients"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete":{
+                "tags":["Ingredients API"],
+                "description": "delete Ingredient by id",
+                "summary": "delete Ingredient by id",
+                "parameters": [
+                    {
+                        "name" : "ingredientId",
+                        "in" : "path",
+                        "description": "Ingredient Id"
+                    }
+                ],
+                "responses": {
+                    "200" :{
+                        "description": "Succes Delete Ingredient",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type": "object",
+                                    "properties": {
+                                        "code":{
+                                            "type": "number"
+                                        },
+                                        "status":{
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/authors":{
+            "get":{
+                "tags": ["Authors API"],
+                "summary": "List all Authors",
+                "description": "List all Authors",
+                "responses": {
+                    "200":{
+                        "description": "Succes get all Authors",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type": "object",
+                                    "properties": {
+                                        "code":{
+                                            "type": "number"
+                                        },
+                                        "status":{
+                                            "type": "string"
+                                        },
+                                        "data":{
+                                            "type": "array",
+                                            "items":{
+                                                "$ref": "#/components/schemas/Authors"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post":{
+                "tags": ["Authors API"],
+                "summary": "POST Author",
+                "description": "Post Author",
+                "responses": {
+                    "200":{
+                        "description": "Succes Add Author",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type": "object",
+                                    "properties": {
+                                        "code":{
+                                            "type": "number"
+                                        },
+                                        "status":{
+                                            "type": "string"
+                                        },
+                                        "data":{
+                                            "$ref": "#/components/schemas/CreateOrUpdateAuthors"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/author/{authorId}":{
+            "get":{
+                "tags":["Authors API"],
+                "description": "Get Author by id",
+                "summary": "get Author by id",
+                "parameters": [
+                    {
+                        "name" : "authorId",
+                        "in" : "path",
+                        "description": "Author Id"
+                    }
+                ],
+                "responses": {
+                    "200":{
+                        "description": "Succes get Author",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type": "object",
+                                    "properties": {
+                                        "code":{
+                                            "type": "number"
+                                        },
+                                        "status":{
+                                            "type": "string"
+                                        },
+                                        "data":{
+                                            "$ref" : "#/components/schemas/RecipeAuthorById"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put":{
+                "tags": ["Authors API"],
+                "summary": "Update Author",
+                "description": "Update Author by Id",
+                "parameters": [{
+                    "name" : "authorId",
+                    "in" : "path",
+                    "description": "Author Id"
+                }],
+                "requestBody":{
+                    "content": {
+                        "application/json":{
+                            "schema":{
+                                "$ref": "#/components/schemas/CreateOrUpdateAuthors"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200":{
+                        "description": "Succes update author",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type": "object",
+                                    "properties": {
+                                        "code":{
+                                            "type": "number"
+                                        },
+                                        "status":{
+                                            "type": "string"
+                                        },
+                                        "data":{
+                                            "$ref" : "#/components/schemas/Authors"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete":{
+                "tags":["Authors API"],
+                "description": "delete author by id",
+                "summary": "delete author by id",
+                "parameters": [
+                    {
+                        "name" : "authorId",
+                        "in" : "path",
+                        "description": "Author Id"
+                    }
+                ],
+                "responses": {
+                    "200" :{
+                        "description": "Succes Delete Author",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type": "object",
+                                    "properties": {
+                                        "code":{
+                                            "type": "number"
+                                        },
+                                        "status":{
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/recipes":{
+            "get":{
+                "tags": ["Recipes API"],
+                "summary": "Get all recipes",
+                "description": "Get all recipes",
+                "responses": {
+                    "200":{
+                        "description": "Succes Get all recipes",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type": "object",
+                                    "properties": {
+                                        "code":{
+                                            "type": "number"
+                                        },
+                                        "status":{
+                                            "type": "string"
+                                        },
+                                        "data":{
+                                            "$ref": "#/components/schemas/Recipes"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post":{
+                "tags": ["Recipes API"],
+                "summary": "POST Recipes",
+                "description": "Post Recipes",
+                "responses": {
+                    "200":{
+                        "description": "Succes Add Recipe",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type": "object",
+                                    "properties": {
+                                        "code":{
+                                            "type": "number"
+                                        },
+                                        "status":{
+                                            "type": "string"
+                                        },
+                                        "data":{
+                                            "$ref": "#/components/schemas/CreateOrUpdateRecipe"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/recipe/{recipeSlug}":{
+            "get":{
+                "tags":["Recipes API"],
+                "description": "Get Recipe by id",
+                "summary": "get Recipe by id",
+                "parameters": [
+                    {
+                        "name" : "recipeSlug",
+                        "in" : "path",
+                        "description": "Recipe Slug",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200":{
+                        "description": "Succes get Recipe",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type": "object",
+                                    "properties": {
+                                        "code":{
+                                            "type": "number"
+                                        },
+                                        "status":{
+                                            "type": "string"
+                                        },
+                                        "data":{
+                                            "$ref" : "#/components/schemas/RecipeById"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put":{
+                "tags":["Recipes API"],
+                "description": "update Recipe by Slug",
+                "summary": "update Recipe by Slug",
+                "parameters": [
+                    {
+                        "name" : "recipeSlug",
+                        "in" : "path",
+                        "description": "Recipe Slug"
+                    }
+                ],
+                "requestBody":{
+                    "content": {
+                        "application/json":{
+                            "schema":{
+                                "$ref": "#/components/schemas/CreateOrUpdateRecipe"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200" :{
+                        "description": "Succes Update Recipe",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type": "object",
+                                    "properties": {
+                                        "code":{
+                                            "type": "number"
+                                        },
+                                        "status":{
+                                            "type": "string"
+                                        },
+                                        "data":{
+                                            "$ref" : "#/components/schemas/RecipeById"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete":{
+                "tags":["Recipes API"],
+                "description": "delete Recipe by id",
+                "summary": "delete Recipe by id",
+                "parameters": [
+                    {
+                        "name" : "recipe",
+                        "in" : "path",
+                        "description": "Recipe Id"
+                    }
+                ],
+                "responses": {
+                    "200" :{
+                        "description": "Succes Delete Recipe",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type": "object",
+                                    "properties": {
+                                        "code":{
+                                            "type": "number"
+                                        },
+                                        "status":{
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "CreateOrUpdateCategory":{
+                "type": "object",
+                "properties": {
+                    "name":{
+                        "type": "string"
+                    },
+                    "icon":{
+                        "type": "string"
+                    }
+                }
+            },
+            "Categories":{
+                "type": "object",
+                "properties": {
+                    "id":{
+                        "type": "integer"
+                    },
+                    "name":{
+                        "type": "string"
+                    },
+                    "icon":{
+                        "type": "string"
+                    },
+                    "slug":{
+                        "type": "string"
+                    },
+                    "recipeCount":{
+                        "type": "number"
+                    }
+                }
+            },
+            "CategoryById":{
+            "type": "object",
+                "properties": {
+                    "id":{
+                        "type": "integer"
+                    },
+                    "name":{
+                        "type": "string"
+                    },
+                    "icon":{
+                        "type": "string"
+                    },
+                    "slug":{
+                        "type": "string"
+                    },
+                    "recipeCount":{
+                        "type": "number"
+                    },
+                    "recipes":{
+                        "type": "object",
+                        "properties": {
+                            "id":{
+                                "type": "number"
+                            },
+                            "name":{
+                                "type": "string"
+                            },
+                            "slug":{
+                                "type": "string"
+                            },
+                            "url_file":{
+                                "type": "string"
+                            },
+                            "url_video":{
+                                "type": "string"
+                            },
+                            "thumbnail":{
+                                "type": "string"
+                            },
+                            "about":{
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "CreateOrUpdateIngredients":{
+                "type": "object",
+                "properties": {
+                    "name":{
+                        "type": "string"
+                    },
+                    "photo":{
+                        "type": "string"
+                    }
+                }
+            },
+            "Ingredients":{
+                "type": "object",
+                "properties": {
+                    "id":{
+                        "type": "integer"
+                    },
+                    "name":{
+                        "type": "string"
+                    },
+                    "photo":{
+                        "type": "string"
+                    }
+                }
+            },
+            "Authors":{
+                "type": "object",
+                "properties": {
+                    "id":{
+                        "type": "integer"
+                    },
+                    "name":{
+                        "type": "string"
+                    },
+                    "photo":{
+                        "type": "string"
+                    }
+                }
+            },
+            "RecipeAuthorById":{
+                "type": "object",
+                "properties": {
+                    "id":{
+                        "type": "integer"
+                    },
+                    "name":{
+                        "type": "string"
+                    },
+                    "photo":{
+                        "type": "string"
+                    },
+                    "recipes":{
+                        "type": "object",
+                        "properties": {
+                            "id":{
+                                "type": "number"
+                            },
+                            "name":{
+                                "type": "string"
+                            },
+                            "slug":{
+                                "type": "string"
+                            },
+                            "url_file":{
+                                "type": "string"
+                            },
+                            "url_video":{
+                                "type": "string"
+                            },
+                            "thumbnail":{
+                                "type": "string"
+                            },
+                            "about":{
+                                "type": "string"
+                            }
+                        }
+                    }
+                    
+                }
+            },
+            "CreateOrUpdateAuthors":{
+                "type": "object",
+                "properties": {
+                    "name":{
+                        "type": "string"
+                    },
+                    "photo":{
+                        "type": "string"
+                    }
+                }
+            },
+            "Recipes":{
+                "type": "object",
+                "properties": {
+                    "id":{
+                        "type": "number"
+                    },
+                    "name":{
+                        "type": "string"
+                    },
+                    "slug":{
+                        "type": "string"
+                    },
+                    "url_file":{
+                        "type": "string"
+                    },
+                    "url_video":{
+                        "type": "string"
+                    },
+                    "thumbnail":{
+                        "type": "string"
+                    },
+                    "about":{
+                        "type": "string"
+                    },
+                    "category":{
+                        "type": "array",
+                        "items":{
+                            "type": "object",
+                            "properties": {
+                            "id":{
+                                "type": "integer"
+                            },
+                            "name":{
+                                "type": "string"
+                            },
+                            "icon":{
+                                "type": "string"
+                            },
+                            "slug":{
+                                "type": "string"
+                            },
+                            "recipeCount":{
+                                "type": "number"
+                            }
+                        }
+                        }
+                    },
+                    "photos":{
+                        "type": "array",
+                        "items":{
+                            "type": "object",
+                                "properties": {
+                                "id":{
+                                    "type": "number"
+                                },
+                                "photo":{
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "RecipeById":{
+                "type": "object",
+                "properties": {
+                    "id":{
+                        "type": "number"
+                    },
+                    "name":{
+                        "type": "string"
+                    },
+                    "slug":{
+                        "type": "string"
+                    },
+                    "url_file":{
+                        "type": "string"
+                    },
+                    "url_video":{
+                        "type": "string"
+                    },
+                    "thumbnail":{
+                        "type": "string"
+                    },
+                    "about":{
+                        "type": "string"
+                    },
+                    "category":{
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "id":{
+                                "type": "integer"
+                                },
+                                "name":{
+                                    "type": "string"
+                                },
+                                "icon":{
+                                    "type": "string"
+                                },
+                                "slug":{
+                                    "type": "string"
+                                },
+                                "recipeCount":{
+                                    "type": "number"
+                                }
+                            }
+                        }
+                    },
+                    "author":{
+                        "type": "object",
+                        "properties": {
+                            "id":{
+                                "type": "integer"
+                            },
+                            "name":{
+                                "type": "string"
+                            },
+                            "photo":{
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "recipe_inredient":{
+                        "type": "array",
+                        "items":{
+                            "type": "object",
+                            "properties": {
+                                "id":{
+                                    "type": "number"
+                                },
+                                "ingredient":{
+                                    "type": "object",
+                                    "properties": {
+                                        "id":{
+                                            "type": "number"
+                                        },
+                                        "name":{
+                                            "type": "string"
+                                        },
+                                        "photo":{
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "photos":{
+                        "type": "array",
+                        "items":{
+                            "type": "object",
+                            "properties": {
+                                "id":{
+                                    "type": "number"
+                                },
+                                "photo":{
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "tutorials":{
+                        "type": "array",
+                        "items":{
+                            "type": "object",
+                                "properties": {
+                                "id":{
+                                    "type": "number"
+                                },
+                                "name":{
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "CreateOrUpdateRecipe":{
+                "type": "object",
+                "properties": {
+                    "name":{
+                        "title": "string"
+                    },
+                    "slug":{
+                        "type": "string"
+                    },
+                    "thumbnail":{
+                        "type": "string"
+                    },
+                    "about":{
+                        "type": "string"
+                    },
+                    "url_file":{
+                        "type": "string"
+                    },
+                    "url_video":{
+                        "type": "string"
+                    },
+                    "category_id":{
+                        "type": "integer"
+                    },
+                    "recipe_author_id":{
+                        "type": "integer"
+                    }
+                }
+            }
+        }
+    }
+}

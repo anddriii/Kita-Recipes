@@ -1,0 +1,64 @@
+Api Spec Kita Recipes
+
+Category:
+- id
+- name
+- icon
+- slug
+- recipe_count  // menghitung jumlah category
+- recipes //menampilkan relasi dari recipes 
+
+Ingredie
+- id
+- name
+- photo
+
+RecipeAuthor:
+- id
+- name
+- photo
+- recipes //menampilkan relasi dari recipes 
+
+RecipeIngredient
+- id
+- ingredient // menampilkan relasi dari inredient
+
+recipe photo:
+- id
+- photo
+
+recipes:
+- id
+- name
+- slug
+- url_file
+- url_video
+- thumbnail
+- about
+- category // menampilkan relasi dari category
+
+- photos // menampilkan relasi dari photos
+    -type array karena satu resep bisa ada banyak photo
+
+recipe by id:
+- id
+- name
+- slug
+- url_file
+- url_video
+- thumbnail
+- about
+- category // menampilkan relasi dari category
+
+- recipe_ingredient // menampilkan relasi dari recipeIngredients
+    -type array karena satu resep biisa ada banyak ingredient
+
+- photos // menampilkan relasi dari photos
+    -type array karena satu resep bisa ada banyak photo
+
+- tutorials // menampilkan relasi dari tutorials
+    -type array karena sati resep bisa ada berbagai tutorials
+
+- author // menampilkan relasi dari author
+
+-nothing
