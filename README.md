@@ -1,76 +1,45 @@
 # KitaRecipes
 
-<a alt="Kafka Logo" href="https://www.instagram.com/andristwan._/" target="_blank" rel="noreferrer"><img src="https://cdn3.emoji.gg/emojis/7873-kafkasmug.png" width="45"></a>
+<a alt="Kafka Logo" href="https://www.instagram.com/andristwan._/" target="_blank" rel="noreferrer"><img src="https://cdn3.emoji.gg/emojis/7873-kafkasmug.png" width="80"></a>
 
-You know who she is? Yeah, she's my wife.
+You know who she is? Yeah, she's my wife. Hahaha Kidding.
 
+Kita Recipes is a web platform designed for sharing and discovering food recipes. With Kita Recipes, users can search for their desired recipes and share their own recipes for others to explore and use. Each recipe includes detailed instructions, videos, and files to ensure clarity and ease of use.
 
-## Finish your CI setup
+```sh This project isn't finished yet, so it can't be used. Thanks```
 
-[Click here to finish setting up your workspace!](https://cloud.nx.app/connect/bKhx1FZQUg)
-
-
-## Run tasks
-
-To run tasks with Nx use:
-
-```sh
-npx nx <target> <project-name>
-```
-
-For example:
-
-```sh
-npx nx build myproject
-```
-
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
-
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Add new projects
-
-While you could add new projects to your workspace manually, you might want to leverage [Nx plugins](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) and their [code generation](https://nx.dev/features/generate-code?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) feature.
-
-To install a new plugin you can use the `nx add` command. Here's an example of adding the React plugin:
-```sh
-npx nx add @nx/react
-```
-
-Use the plugin's generator to create new projects. For example, to create a new React app or library:
-
-```sh
-# Generate an app
-npx nx g @nx/react:app demo
-
-# Generate a library
-npx nx g @nx/react:lib some-lib
-```
-
-You can use `npx nx list` to get a list of installed plugins. Then, run `npx nx list <plugin-name>` to learn about more specific capabilities of a particular plugin. Alternatively, [install Nx Console](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) to browse plugins and generators in your IDE.
-
-[Learn more about Nx plugins &raquo;](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) | [Browse the plugin registry &raquo;](https://nx.dev/plugin-registry?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+## Features
+- Recipe Search: Quickly find recipes based on your preferences.
+- Comprehensive Recipe Details: Each recipe includes a video tutorial and supporting files for easy understanding.
+- Community Contributions: Users can share their own recipes with the community.
 
 
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
 
-## Install Nx Console
+## Installation
+1. Import Database File: Start by importing the provided database file.
+2. Database Connection: Modify the `conn.go` file located in `kita-recipes/apps/backend/cmd/internal/model/conn.go.` Update the `dsn` variable with your database username and password.
+3. Run the Application:
+    ```sh npm run start ```
 
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
 
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+## Technologies Used
+# Backend
+- Restful API
+- Gorm: Object Relational Mapper for Go.
+- Swagger: API documentation tool.
+- Gofiber: Web framework for Go.
 
-## Useful links
+# Frontend
+- React: JavaScript library for building user interfaces.
+- Tailwind: Utility-first CSS framework.
+- Cypress: Testing framework for frontend applications.
+- Vite: Build tool for frontend development.
+- Eslint: Linting tool for maintaining code quality.
 
-Learn more:
+## Screenshots
+anggap saja ini foto screenshots
 
-- [Learn more about this workspace setup](https://nx.dev/getting-started/intro#learn-nx?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+## Contact Information
+- [Linkedin](hhttps://www.linkedin.com/in/andri-setiawan-7b1669291/)
+- [Instagram](https://www.instagram.com/andristwan._/)
 
-And join the Nx community:
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
