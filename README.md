@@ -1,12 +1,14 @@
 # KitaRecipes
 
-<a alt="Kafka Logo" href="https://www.instagram.com/andristwan._/" target="_blank" rel="noreferrer"><img src="https://cdn3.emoji.gg/emojis/7873-kafkasmug.png" width="80"></a>
+<a alt="Kafka Logo" href="https://www.instagram.com/andristwan._/" target="_blank" rel="noreferrer"><img src="https://cdn3.emoji.gg/emojis/7873-kafkasmug.png" width="160"></a>
 
 You know who she is? Yeah, she's my wife. Hahaha Kidding.
 
 Kita Recipes is a web platform designed for sharing and discovering food recipes. With Kita Recipes, users can search for their desired recipes and share their own recipes for others to explore and use. Each recipe includes detailed instructions, videos, and files to ensure clarity and ease of use.
 
-```sh This project isn't finished yet, so it can't be used. Thanks```
+```sh
+This project isn't finished yet, so it can't be used. Thanks
+```
 
 ## Features
 - Recipe Search: Quickly find recipes based on your preferences.
@@ -19,7 +21,9 @@ Kita Recipes is a web platform designed for sharing and discovering food recipes
 1. Import Database File: Start by importing the provided database file.
 2. Database Connection: Modify the `conn.go` file located in `kita-recipes/apps/backend/cmd/internal/model/conn.go.` Update the `dsn` variable with your database username and password.
 3. Run the Application:
-    ```sh npm run start ```
+```sh
+npm run start
+```
 
 
 ## Technologies Used
@@ -40,6 +44,6 @@ Kita Recipes is a web platform designed for sharing and discovering food recipes
 anggap saja ini foto screenshots
 
 ## Contact Information
-- [Linkedin](hhttps://www.linkedin.com/in/andri-setiawan-7b1669291/)
+- [Linkedin](https://www.linkedin.com/in/andri-setiawan-7b1669291/)
 - [Instagram](https://www.instagram.com/andristwan._/)
 
