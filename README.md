@@ -27,18 +27,18 @@ npm run start
 
 
 ## Technologies Used
-# Backend
-- Restful API
-- Gorm: Object Relational Mapper for Go.
-- Swagger: API documentation tool.
-- Gofiber: Web framework for Go.
+- Backend
+1. Restful API
+2. Gorm: Object Relational Mapper for Go.
+3. Swagger: API documentation tool.
+4. Gofiber: Web framework for Go.
 
-# Frontend
-- React: JavaScript library for building user interfaces.
-- Tailwind: Utility-first CSS framework.
-- Cypress: Testing framework for frontend applications.
-- Vite: Build tool for frontend development.
-- Eslint: Linting tool for maintaining code quality.
+- Frontend
+1. React: JavaScript library for building user interfaces.
+2. Tailwind: Utility-first CSS framework.
+3. Cypress: Testing framework for frontend applications.
+4. Vite: Build tool for frontend development.
+5. Eslint: Linting tool for maintaining code quality.
 
 ## Screenshots
 anggap saja ini foto screenshots
