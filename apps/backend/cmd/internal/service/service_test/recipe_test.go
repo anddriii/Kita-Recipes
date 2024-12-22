@@ -38,13 +38,21 @@ func TestRecipeSave(t *testing.T) {
 
 	// Pastikan AuthorRequest menggunakan pointer
 	request := &dto.RecipeRequestCreate{
-		Name:           "Cara bikin Es teh by Furina",
+		Name:           "Cara bikin Es teh bpy Furiaaaa",
 		Thumbnail:      fileHeader,
 		About:          "Makaron adalah",
 		UrlFile:        "makaron.pdf",
 		UrlVideo:       "ada",
 		CategoryId:     4,
 		RecipeAuthorId: 8,
+		RecipePhotos: []dto.PhotoUpload{
+			{
+				File: *fileHeader,
+			},
+			{
+				File: *fileHeader,
+			},
+		},
 	}
 
 	// Jalankan service Save

@@ -1078,6 +1078,20 @@
                     },
                     "recipe_author_id":{
                         "type": "integer"
+                    },
+                    "photos":{
+                        "type": "array",
+                        "items":{
+                            "type": "object",
+                            "properties": {
+                                "id":{
+                                    "type": "number"
+                                },
+                                "photo":{
+                                    "type": "string"
+                                }
+                            }
+                        }
                     }
                 }
             }
