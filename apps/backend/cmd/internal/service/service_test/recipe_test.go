@@ -23,7 +23,8 @@ func TestRecipeSave(t *testing.T) {
 	ctx := context.TODO()
 	validate := validator.New()
 	authorRepo := repository.NewRecipeRepository()
-	categoryService := service.NewRecipeService(authorRepo, db, validate)
+	recipePhotoRepository := repository.NewRecipePhotoRepository()
+	categoryService := service.NewRecipeService(authorRepo, recipePhotoRepository, db, validate)
 
 	// Pastikan direktori storage/images ada sebelum test
 	absolutePath, err := filepath.Abs("storage/images/categories/")
@@ -38,19 +39,19 @@ func TestRecipeSave(t *testing.T) {
 
 	// Pastikan AuthorRequest menggunakan pointer
 	request := &dto.RecipeRequestCreate{
-		Name:           "Cara bikin Es teh bpy Furiaaaa",
+		Name:           "Cara bikin Es teh bpy Furiahayaaa 8",
 		Thumbnail:      fileHeader,
 		About:          "Makaron adalah",
 		UrlFile:        "makaron.pdf",
 		UrlVideo:       "ada",
-		CategoryId:     4,
+		CategoryId:     5,
 		RecipeAuthorId: 8,
-		RecipePhotos: []dto.PhotoUpload{
+		RecipePhotos: []dto.RecipePhotos{
 			{
-				File: *fileHeader,
+				Photo: *fileHeader,
 			},
 			{
-				File: *fileHeader,
+				Photo: *fileHeader,
 			},
 		},
 	}
@@ -58,17 +59,18 @@ func TestRecipeSave(t *testing.T) {
 	// Jalankan service Save
 	response, err := categoryService.Save(ctx, *request)
 	require.NoError(t, err)
-	assert.Equal(t, "Shiduri istri saya", response.Name)
+	assert.Equal(t, "Cara bikin Es teh bpy Furiahayaaa 8", response.Name)
 }
 
 func TestFindByIdRecipe(t *testing.T) {
 	db := SetupTestDB()
 	validate := validator.New()
 	repo := repository.NewRecipeRepository()
-	service := service.NewRecipeService(repo, db, validate)
+	recipePhotoRepository := repository.NewRecipePhotoRepository()
+	service := service.NewRecipeService(repo, recipePhotoRepository, db, validate)
 
 	ctx := context.Background()
-	author, err := service.FindById(ctx, 2)
+	author, err := service.FindById(ctx, 77)
 
 	assert.NoError(t, err)
 	fmt.Println(author)
@@ -80,7 +82,8 @@ func TestUpdateRecipe(t *testing.T) {
 	validate := validator.New()
 
 	repo := repository.NewRecipeRepository()
-	service := service.NewRecipeService(repo, db, validate)
+	recipePhotoRepository := repository.NewRecipePhotoRepository()
+	service := service.NewRecipeService(repo, recipePhotoRepository, db, validate)
 
 	var initialRecipe domain.Recipe
 	result := db.Where("id = ?", 46).First(&initialRecipe)
@@ -147,7 +150,8 @@ func TestDeleteRecipe(t *testing.T) {
 	db := SetupTestDB()
 	validate := validator.New()
 	repo := repository.NewRecipeRepository()
-	service := service.NewRecipeService(repo, db, validate)
+	recipePhotoRepository := repository.NewRecipePhotoRepository()
+	service := service.NewRecipeService(repo, recipePhotoRepository, db, validate)
 
 	ctx := context.Background()
 	service.Delete(ctx, 33)
@@ -162,7 +166,8 @@ func TestFindAllRecipes(t *testing.T) {
 
 	validate := validator.New()
 	repo := repository.NewRecipeRepository()
-	service := service.NewRecipeService(repo, db, validate)
+	recipePhotoRepository := repository.NewRecipePhotoRepository()
+	service := service.NewRecipeService(repo, recipePhotoRepository, db, validate)
 
 	ctx := context.Background()
 	recipes, err := service.FindAll(ctx)

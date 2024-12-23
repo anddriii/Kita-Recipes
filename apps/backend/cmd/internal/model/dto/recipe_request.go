@@ -11,7 +11,7 @@ type RecipeRequestCreate struct {
 	UrlVideo       string                `validate:"required" json:"url_video"`
 	CategoryId     int                   `json:"category_id"`
 	RecipeAuthorId int                   `json:"recipe_author_id"`
-	RecipePhotos   []PhotoUpload         `json:"photos"`
+	RecipePhotos   []RecipePhotos        `json:"photos"`
 }
 
 type RecipeRequestUpdate struct {

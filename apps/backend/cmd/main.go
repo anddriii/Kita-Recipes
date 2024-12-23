@@ -16,8 +16,9 @@ func main() {
 	// Database & Dependency Injection
 	db := model.OpenConnection() // Fungsi untuk koneksi database
 	validator := validator.New()
+	recipePhotoRepository := repository.NewRecipePhotoRepository()
 	recipeRepo := repository.NewRecipeRepository()
-	recipeService := service.NewRecipeService(recipeRepo, db, validator)
+	recipeService := service.NewRecipeService(recipeRepo, recipePhotoRepository, db, validator)
 	recipeController := controllers.NewRecipeController(recipeService)
 
 	// Routes

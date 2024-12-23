@@ -10,7 +10,7 @@ type RecipeResponses struct {
 	UrlVideo         string `validate:"required" json:"url_video"`
 	CategoryId       int
 	CategoryResponse *CategoryResponse `json:"category"`
-	RecipePhotos     []PhotoUpload     `json:"photos"`
+	RecipePhotos     []*RecipePhotos   `json:"photos"`
 }
 
 type RecipeResponseDetail struct {

@@ -65,10 +65,10 @@ func (controller *RecipeController) Create(c *fiber.Ctx) error {
 
 	photos := form.File["photos"] // Get array of photos
 	if len(photos) > 0 {
-		var photoUploads []dto.PhotoUpload
+		var photoUploads []dto.RecipePhotos
 		for _, photo := range photos {
-			photoUploads = append(photoUploads, dto.PhotoUpload{
-				Filename: photo.Filename,
+			photoUploads = append(photoUploads, dto.RecipePhotos{
+				Photo: *photo,
 			})
 		}
 		request.RecipePhotos = photoUploads

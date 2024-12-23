@@ -14,11 +14,12 @@ func NewRecipeRepository() RecipeRespository {
 	return &RecipeRespositoryImpl{}
 }
 
-func (repository *RecipeRespositoryImpl) Save(ctx context.Context, db *gorm.DB, recipe *domain.Recipe) (domain.Recipe, error) {
+func (repository *RecipeRespositoryImpl) Save(ctx context.Context, db *gorm.DB, recipe *domain.RecipeDetail) (domain.RecipeDetail, error) {
 	err := db.WithContext(ctx).Create(recipe).Error
 	if err != nil {
-		return domain.Recipe{}, err
+		return domain.RecipeDetail{}, err
 	}
+
 	return *recipe, nil
 }
 
