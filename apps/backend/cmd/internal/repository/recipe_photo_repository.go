@@ -9,4 +9,5 @@ import (
 
 type RecipePhotoRepository interface {
 	Save(ctx context.Context, db *gorm.DB, recipePhoto domain.Photo) error
+	Show(ctx context.Context, db *gorm.DB, recipeId int) ([]domain.Photo, error)
 }

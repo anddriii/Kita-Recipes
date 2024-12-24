@@ -39,7 +39,7 @@ func TestRecipeSave(t *testing.T) {
 
 	// Pastikan AuthorRequest menggunakan pointer
 	request := &dto.RecipeRequestCreate{
-		Name:           "Cara bikin Es teh bpy Furiahayaaa 8",
+		Name:           "Cara bikin Es teh bpy Furiahayaaa 14",
 		Thumbnail:      fileHeader,
 		About:          "Makaron adalah",
 		UrlFile:        "makaron.pdf",
@@ -59,7 +59,7 @@ func TestRecipeSave(t *testing.T) {
 	// Jalankan service Save
 	response, err := categoryService.Save(ctx, *request)
 	require.NoError(t, err)
-	assert.Equal(t, "Cara bikin Es teh bpy Furiahayaaa 8", response.Name)
+	assert.Equal(t, "Cara bikin Es teh bpy Furiahayaaa 14", response.Name)
 }
 
 func TestFindByIdRecipe(t *testing.T) {

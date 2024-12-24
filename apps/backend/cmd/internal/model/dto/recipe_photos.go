@@ -3,8 +3,14 @@ package dto
 import "mime/multipart"
 
 type RecipePhotos struct {
-	ID    int64                `json:"id"`
-	Photo multipart.FileHeader `json:"photo"`
+	ID    int64 `json:"id"`
+	Photo multipart.FileHeader
+	Name  string `json:"photo"`
+}
+
+type RecipePhotosShow struct {
+	ID    int64  `json:"id"`
+	Photo string `json:"photo"`
 }
 
 // type PhotoUpload struct {

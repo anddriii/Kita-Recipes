@@ -49,12 +49,46 @@ func (service *RecipeServiceImpl) Save(ctx context.Context, request dto.RecipeRe
 		Name: request.Name,
 	}
 
+	// Path direktori utama
+	// basePath, err := filepath.Abs("../../../../../../assets")
+	if err != nil {
+		return dto.RecipeResponses{}, fmt.Errorf("failed to determine base path: %w", err)
+	}
+
 	// Proses Thumbnail
 	thumbnailFilename := uuid.New().String() + "-" + recipeName.Name + "." +
 		strings.Split(request.Thumbnail.Filename, ".")[len(strings.Split(request.Thumbnail.Filename, "."))-1]
-	thumbnailPath := "../../../../../../assets/images/recipes/" + thumbnailFilename
-	if err := saveFile(request.Thumbnail, thumbnailPath); err != nil {
-		return dto.RecipeResponses{}, fmt.Errorf("failed to save thumbnail: %w", err)
+
+	// Simpan photo thumbnail ke direktori
+	if err := os.MkdirAll(filepath.Dir(thumbnailFilename), os.ModePerm); err != nil {
+		return dto.RecipeResponses{}, err
+	}
+
+	file, err := request.Thumbnail.Open()
+	if err != nil {
+		return dto.RecipeResponses{}, err
+	}
+
+	basePathTh, err := os.Getwd()
+	if err != nil {
+		return dto.RecipeResponses{}, err
+	}
+	uploadPath := filepath.Join(basePathTh, "assets", "images", "recipes")
+	if err := os.MkdirAll(uploadPath, os.ModePerm); err != nil {
+		return dto.RecipeResponses{}, err
+	}
+	filePath := filepath.Join(uploadPath, thumbnailFilename)
+	fmt.Printf("Creating file: %s\n", filePath)
+	out, err := os.Create(filePath)
+	if err != nil {
+		return dto.RecipeResponses{}, err
+	}
+	defer out.Close()
+
+	//salin foto ke penyimpanan
+	_, err = io.Copy(out, file)
+	if err != nil {
+		return dto.RecipeResponses{}, err
 	}
 
 	// Proses RecipePhotos
@@ -62,21 +96,43 @@ func (service *RecipeServiceImpl) Save(ctx context.Context, request dto.RecipeRe
 	for _, photo := range request.RecipePhotos {
 		photoFilename := uuid.New().String() + "-" + recipeName.Name + "." +
 			strings.Split(request.Thumbnail.Filename, ".")[len(strings.Split(request.Thumbnail.Filename, "."))-1]
-		photoPath := "../../../../../../assets/images/recipes/recipes_photos/" + photoFilename
-		// Buat direktori jika belum ada
-		// if err := os.MkdirAll(photoPath, os.ModePerm); err != nil {
-		// 	return dto.RecipeResponseDetail{}, fmt.Errorf("failed to create directory: %w", err)
-		// }
 
-		if err := saveFile(&photo.Photo, photoPath); err != nil {
-			return dto.RecipeResponses{}, fmt.Errorf("failed to save photo: %w", err)
+		if err := os.MkdirAll(filepath.Dir(photoFilename), os.ModePerm); err != nil {
+			return dto.RecipeResponses{}, err
+		}
+
+		file, err := photo.Photo.Open()
+		if err != nil {
+			return dto.RecipeResponses{}, err
+		}
+
+		basePathTh, err := os.Getwd()
+		if err != nil {
+			return dto.RecipeResponses{}, err
+		}
+		uploadPath := filepath.Join(basePathTh, "assets", "images", "recipes", "photos")
+		if err := os.MkdirAll(uploadPath, os.ModePerm); err != nil {
+			return dto.RecipeResponses{}, err
+		}
+		filePath := filepath.Join(uploadPath, photoFilename)
+		fmt.Printf("Creating file: %s\n", filePath)
+		out, err := os.Create(filePath)
+		if err != nil {
+			return dto.RecipeResponses{}, err
+		}
+		defer out.Close()
+
+		//salin foto ke penyimpanan
+		_, err = io.Copy(out, file)
+		if err != nil {
+			return dto.RecipeResponses{}, err
 		}
 
 		photoFilenames = append(photoFilenames, photoFilename)
 	}
 
 	// Simpan data Recipe ke DB
-	recipe := domain.RecipeDetail{
+	recipe := domain.Recipe{
 		Name:           request.Name,
 		Slug:           utils.Slugify(request.Name),
 		Thumbnail:      thumbnailFilename,
@@ -102,10 +158,17 @@ func (service *RecipeServiceImpl) Save(ctx context.Context, request dto.RecipeRe
 		}
 	}
 
+	// Mapping RecipePhotos
+	photoses, err := service.RecipePhotoRepository.Show(ctx, service.DB, int(recipe.ID))
+	if err != nil {
+		return dto.RecipeResponses{}, err
+	}
+
 	var photos []*dto.RecipePhotos
-	for _, photo := range recipe.RecipePhoto {
+	for _, photo := range photoses {
 		photos = append(photos, &dto.RecipePhotos{
-			ID: photo.ID,
+			ID:   photo.ID,
+			Name: photo.Photo,
 		})
 	}
 
@@ -141,15 +204,18 @@ func (service *RecipeServiceImpl) Save(ctx context.Context, request dto.RecipeRe
 }
 
 func saveFile(fileHeader *multipart.FileHeader, filePath string) error {
+	dir := filepath.Dir(filePath)
+
+	// Pastikan direktori ada
+	if err := os.MkdirAll(dir, os.ModePerm); err != nil {
+		return fmt.Errorf("failed to create directory: %w", err)
+	}
+
 	file, err := fileHeader.Open()
 	if err != nil {
 		return fmt.Errorf("failed to open file: %w", err)
 	}
 	defer file.Close()
-
-	if err := os.MkdirAll(filepath.Dir(filePath), os.ModePerm); err != nil {
-		return fmt.Errorf("failed to create directory: %w", err)
-	}
 
 	out, err := os.Create(filePath)
 	if err != nil {
@@ -162,6 +228,7 @@ func saveFile(fileHeader *multipart.FileHeader, filePath string) error {
 		return fmt.Errorf("failed to copy file: %w", err)
 	}
 
+	log.Println("File saved successfully:", filePath)
 	return nil
 }
 
