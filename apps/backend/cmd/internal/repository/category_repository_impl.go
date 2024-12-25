@@ -23,8 +23,9 @@ func (repository *CategoryRepositoryImpl) Save(ctx context.Context, db *gorm.DB,
 }
 
 func (repository *CategoryRepositoryImpl) Update(ctx context.Context, db *gorm.DB, category *domain.CategoryDetail) (domain.CategoryDetail, error) {
-	err := db.WithContext(ctx).Model(&domain.Categories{}).Where("slug = ?", category.Slug).Updates(domain.Categories{
+	err := db.WithContext(ctx).Model(&domain.Categories{}).Where("id = ?", category.ID).Updates(domain.Categories{
 		Name: category.Name,
+		Slug: category.Slug,
 		Icon: category.Icon,
 	}).Error
 	if err != nil {
@@ -42,9 +43,9 @@ func (repository *CategoryRepositoryImpl) Delete(ctx context.Context, db *gorm.D
 	return err
 }
 
-func (repository *CategoryRepositoryImpl) FindBySlug(ctx context.Context, db *gorm.DB, slug string) (domain.CategoryDetail, error) {
+func (repository *CategoryRepositoryImpl) FindById(ctx context.Context, db *gorm.DB, id int) (domain.CategoryDetail, error) {
 	var category domain.CategoryDetail
-	err := db.WithContext(ctx).Preload("Recipes").Where("slug = ?", slug).First(&category).Error
+	err := db.WithContext(ctx).Preload("Recipes").Where("id = ?", id).First(&category).Error
 	if err != nil {
 		panic(err)
 	}

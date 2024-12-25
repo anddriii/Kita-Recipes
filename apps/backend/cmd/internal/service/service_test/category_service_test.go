@@ -38,7 +38,7 @@ func TestCategorySave(t *testing.T) {
 
 	// Pastikan AuthorRequest menggunakan pointer
 	request := &dto.CategoryRequest{
-		Name: "Changli istri saya",
+		Name: "Yelan is my wifeee",
 		Icon: fileHeader,
 	}
 
@@ -56,14 +56,18 @@ func TestUpdateCategory(t *testing.T) {
 	repo := repository.NewCategoryRepository()
 	service := service.NewCategoryService(repo, db, validate)
 
-	// Seed initial data
-	initialAuthor := domain.Categories{
-		Name: "ini tes",
-		Slug: "ini tes",
-		Icon: "original_photoasd.jpg",
-	}
-	result := db.Create(&initialAuthor)
+	var initialCategory domain.Categories
+	result := db.Where("id = ?", 10).First(&initialCategory)
 	assert.Nil(t, result.Error)
+
+	// Seed initial data
+	// initialCategory := domain.Categories{
+	// 	Name: "po",
+	// 	Slug: "pppppp",
+	// 	Icon: "original_photoasd.jpg",
+	// }
+	// result := db.Create(&initialCategory)
+	// assert.Nil(t, result.Error)
 
 	fileContent := []byte("dummy image content")
 	fileHeader, err := createTestFileHeaderFromBuffer("asdasd.jpg", fileContent)
@@ -71,18 +75,18 @@ func TestUpdateCategory(t *testing.T) {
 
 	// Prepare update request
 	updateRequest := &dto.CategoryRequest{
-		ID:   initialAuthor.ID,
-		Name: "Zhezhi tukang gambar",
-		Slug: "ini tes",
+		ID:   initialCategory.ID,
+		Name: "Yelan is my wife yuhu",
+		Slug: initialCategory.Slug,
 		Icon: fileHeader,
 	}
 
 	// Call Update service
 	ctx := context.Background()
-	_, err = service.Update(ctx, updateRequest)
+	_, err = service.Update(ctx, *updateRequest)
 	assert.Nil(t, err, "apa saja ")
 
-	fmt.Println(initialAuthor.ID)
+	fmt.Println(initialCategory.Slug)
 }
 
 func TestFindAllCategory(t *testing.T) {
@@ -106,7 +110,7 @@ func TestFindByIdCategory(t *testing.T) {
 	service := service.NewCategoryService(repo, db, validate)
 
 	ctx := context.Background()
-	author, err := service.FindById(ctx, "ini tes")
+	author, err := service.FindById(ctx, 18)
 
 	assert.NoError(t, err)
 	fmt.Println(author)
@@ -119,7 +123,7 @@ func TestDeleteCategory(t *testing.T) {
 	service := service.NewCategoryService(repo, db, validate)
 
 	ctx := context.Background()
-	service.Delete(ctx, "ams")
+	service.Delete(ctx, 7)
 
 	var author domain.RecipeAuthor
 	result := db.First(&author, "ams")

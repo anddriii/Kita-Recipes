@@ -40,7 +40,7 @@ func TestRecipeSave(t *testing.T) {
 
 	// Pastikan AuthorRequest menggunakan pointer
 	request := &dto.RecipeRequestCreate{
-		Name:           "Cara bikin Es teh bpy Furiahayaaa 15",
+		Name:           "Cara bikin Es teh bpy Furiahayaaa 16",
 		Thumbnail:      fileHeader,
 		About:          "Makaron adalah",
 		UrlFile:        "makaron.pdf",
@@ -89,7 +89,7 @@ func TestUpdateRecipe(t *testing.T) {
 	service := service.NewRecipeService(repo, recipePhotoRepository, categoryRepo, db, validate)
 
 	var initialRecipe domain.Recipe
-	result := db.Where("id = ?", 46).First(&initialRecipe)
+	result := db.Where("id = ?", 128).First(&initialRecipe)
 	assert.Nil(t, result.Error)
 
 	// // Seed initial data
@@ -113,7 +113,7 @@ func TestUpdateRecipe(t *testing.T) {
 	// Prepare update request
 	updateRequest := &dto.RecipeRequestUpdate{
 		ID:             initialRecipe.ID,
-		Name:           "Cara bikin Jus mangga by shiduri",
+		Name:           "Cara bikin Jus mangga by Kafka",
 		Slug:           initialRecipe.Slug,
 		Thumbnail:      fileHeader,
 		About:          "Semoga tidak error, pleasseeee",

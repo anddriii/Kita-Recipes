@@ -90,19 +90,20 @@ func (service *CategoryServiceImpl) Create(ctx context.Context, request dto.Cate
 }
 
 // Update implements CategoryService.
-func (service *CategoryServiceImpl) Update(ctx context.Context, request *dto.CategoryRequest) (dto.CategoryResponseDetail, error) {
+func (service *CategoryServiceImpl) Update(ctx context.Context, request dto.CategoryRequest) (dto.CategoryResponseDetail, error) {
 	err := service.Validate.Struct(request)
 	if err != nil {
 		return dto.CategoryResponseDetail{}, err
 	}
 
-	category, err := service.CategoryRepository.FindBySlug(ctx, service.DB, request.Slug)
+	category, err := service.CategoryRepository.FindById(ctx, service.DB, int(request.ID))
 	if err != nil {
 		return dto.CategoryResponseDetail{}, err
 	}
-	// request.Slug = utils.Slugify(request.Name)
+	newSlug := utils.Slugify(request.Name)
+	request.Slug = newSlug
+	category.Slug = newSlug
 	category.Name = request.Name
-	// category.Slug = request.Slug
 
 	if request.Icon != nil {
 		// Generate nama file baru
@@ -153,8 +154,8 @@ func (service *CategoryServiceImpl) Update(ctx context.Context, request *dto.Cat
 }
 
 // Delete implements CategoryService.
-func (service *CategoryServiceImpl) Delete(ctx context.Context, categorySlug string) {
-	category, err := service.CategoryRepository.FindBySlug(ctx, service.DB, categorySlug)
+func (service *CategoryServiceImpl) Delete(ctx context.Context, id int) {
+	category, err := service.CategoryRepository.FindById(ctx, service.DB, id)
 	if err != nil {
 		panic("Data tidak ditemukan")
 	}
@@ -181,8 +182,8 @@ func (service *CategoryServiceImpl) FindAll(ctx context.Context) ([]dto.Category
 }
 
 // FindById implements CategoryService.
-func (service *CategoryServiceImpl) FindById(ctx context.Context, slug string) (dto.CategoryResponseDetail, error) {
-	categoryDetail, err := service.CategoryRepository.FindBySlug(ctx, service.DB, slug)
+func (service *CategoryServiceImpl) FindById(ctx context.Context, id int) (dto.CategoryResponseDetail, error) {
+	categoryDetail, err := service.CategoryRepository.FindById(ctx, service.DB, int(id))
 	if err != nil {
 		return dto.CategoryResponseDetail{}, err
 	}

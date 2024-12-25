@@ -123,7 +123,7 @@ func (service *RecipeServiceImpl) Save(ctx context.Context, request dto.RecipeRe
 	}
 
 	// Mapping Category
-	category, err := service.CategoryRepository.FindBySlug(ctx, service.DB, request.Slug)
+	category, err := service.CategoryRepository.FindById(ctx, service.DB, request.CategoryId)
 	if err != nil {
 		return dto.RecipeResponses{}, err
 	}
