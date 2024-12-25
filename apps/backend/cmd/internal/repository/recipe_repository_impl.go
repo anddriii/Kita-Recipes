@@ -15,7 +15,7 @@ func NewRecipeRepository() RecipeRespository {
 }
 
 func (repository *RecipeRespositoryImpl) Save(ctx context.Context, db *gorm.DB, recipe *domain.Recipe) (domain.Recipe, error) {
-	err := db.WithContext(ctx).Preload("RecipePhoto").Create(recipe).Error
+	err := db.WithContext(ctx).Create(recipe).Error
 	if err != nil {
 		return domain.Recipe{}, err
 	}

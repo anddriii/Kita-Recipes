@@ -18,7 +18,8 @@ func main() {
 	validator := validator.New()
 	recipePhotoRepository := repository.NewRecipePhotoRepository()
 	recipeRepo := repository.NewRecipeRepository()
-	recipeService := service.NewRecipeService(recipeRepo, recipePhotoRepository, db, validator)
+	categoryRepo := repository.NewCategoryRepository()
+	recipeService := service.NewRecipeService(recipeRepo, recipePhotoRepository, categoryRepo, db, validator)
 	recipeController := controllers.NewRecipeController(recipeService)
 
 	// Routes

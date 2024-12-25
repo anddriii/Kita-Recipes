@@ -5,12 +5,11 @@ import "mime/multipart"
 type RecipePhotos struct {
 	ID    int64 `json:"id"`
 	Photo multipart.FileHeader
-	Name  string `json:"photo"`
 }
 
-type RecipePhotosShow struct {
-	ID    int64  `json:"id"`
-	Photo string `json:"photo"`
+type RecipePhotosResponse struct {
+	ID   int64  `json:"id"`
+	Name string `json:"photo"`
 }
 
 // type PhotoUpload struct {

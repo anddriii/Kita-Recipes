@@ -23,14 +23,16 @@ import (
 
 type RecipeServiceImpl struct {
 	RecipeRepository      repository.RecipeRespository
+	CategoryRepository    repository.CategoryRepository
 	RecipePhotoRepository repository.RecipePhotoRepository
 	DB                    *gorm.DB
 	Validate              *validator.Validate
 }
 
-func NewRecipeService(recipeRepository repository.RecipeRespository, recipePhoto repository.RecipePhotoRepository, DB *gorm.DB, validate *validator.Validate) RecipeService {
+func NewRecipeService(recipeRepository repository.RecipeRespository, recipePhoto repository.RecipePhotoRepository, categoryRepository repository.CategoryRepository, DB *gorm.DB, validate *validator.Validate) RecipeService {
 	return &RecipeServiceImpl{
 		RecipeRepository:      recipeRepository,
+		CategoryRepository:    categoryRepository,
 		RecipePhotoRepository: recipePhoto,
 		DB:                    DB,
 		Validate:              validate,
@@ -50,84 +52,32 @@ func (service *RecipeServiceImpl) Save(ctx context.Context, request dto.RecipeRe
 	}
 
 	// Path direktori utama
-	// basePath, err := filepath.Abs("../../../../../../assets")
+	basePath, err := filepath.Abs("../../../assets/")
 	if err != nil {
-		return dto.RecipeResponses{}, fmt.Errorf("failed to determine base path: %w", err)
+		return dto.RecipeResponses{}, fmt.Errorf("gagal memendapatkan path absolut: %w", err)
 	}
 
 	// Proses Thumbnail
 	thumbnailFilename := uuid.New().String() + "-" + recipeName.Name + "." +
 		strings.Split(request.Thumbnail.Filename, ".")[len(strings.Split(request.Thumbnail.Filename, "."))-1]
+	thumbnailPath := filepath.Join(basePath, "images", "recipes", "thumbnails", thumbnailFilename)
 
-	// Simpan photo thumbnail ke direktori
-	if err := os.MkdirAll(filepath.Dir(thumbnailFilename), os.ModePerm); err != nil {
-		return dto.RecipeResponses{}, err
-	}
-
-	file, err := request.Thumbnail.Open()
-	if err != nil {
-		return dto.RecipeResponses{}, err
-	}
-
-	basePathTh, err := os.Getwd()
-	if err != nil {
-		return dto.RecipeResponses{}, err
-	}
-	uploadPath := filepath.Join(basePathTh, "assets", "images", "recipes")
-	if err := os.MkdirAll(uploadPath, os.ModePerm); err != nil {
-		return dto.RecipeResponses{}, err
-	}
-	filePath := filepath.Join(uploadPath, thumbnailFilename)
-	fmt.Printf("Creating file: %s\n", filePath)
-	out, err := os.Create(filePath)
-	if err != nil {
-		return dto.RecipeResponses{}, err
-	}
-	defer out.Close()
-
-	//salin foto ke penyimpanan
-	_, err = io.Copy(out, file)
-	if err != nil {
-		return dto.RecipeResponses{}, err
+	if err := saveFile(request.Thumbnail, thumbnailPath); err != nil {
+		return dto.RecipeResponses{}, fmt.Errorf("failed to save thumbnail: %w", err)
 	}
 
 	// Proses RecipePhotos
 	var photoFilenames []string
 	for _, photo := range request.RecipePhotos {
 		photoFilename := uuid.New().String() + "-" + recipeName.Name + "." +
-			strings.Split(request.Thumbnail.Filename, ".")[len(strings.Split(request.Thumbnail.Filename, "."))-1]
+			strings.Split(photo.Photo.Filename, ".")[len(strings.Split(photo.Photo.Filename, "."))-1]
+		photoPath := filepath.Join(basePath, "images", "recipes", "recipes_photos", photoFilename)
 
-		if err := os.MkdirAll(filepath.Dir(photoFilename), os.ModePerm); err != nil {
-			return dto.RecipeResponses{}, err
-		}
+		log.Println("Saving photo to:", photoPath) // Debug log
 
-		file, err := photo.Photo.Open()
-		if err != nil {
-			return dto.RecipeResponses{}, err
+		if err := saveFile(&photo.Photo, photoPath); err != nil {
+			return dto.RecipeResponses{}, fmt.Errorf("failed to save photo: %w", err)
 		}
-
-		basePathTh, err := os.Getwd()
-		if err != nil {
-			return dto.RecipeResponses{}, err
-		}
-		uploadPath := filepath.Join(basePathTh, "assets", "images", "recipes", "photos")
-		if err := os.MkdirAll(uploadPath, os.ModePerm); err != nil {
-			return dto.RecipeResponses{}, err
-		}
-		filePath := filepath.Join(uploadPath, photoFilename)
-		fmt.Printf("Creating file: %s\n", filePath)
-		out, err := os.Create(filePath)
-		if err != nil {
-			return dto.RecipeResponses{}, err
-		}
-		defer out.Close()
-
-		//salin foto ke penyimpanan
-		_, err = io.Copy(out, file)
-		if err != nil {
-			return dto.RecipeResponses{}, err
-		}
-
 		photoFilenames = append(photoFilenames, photoFilename)
 	}
 
@@ -158,43 +108,38 @@ func (service *RecipeServiceImpl) Save(ctx context.Context, request dto.RecipeRe
 		}
 	}
 
-	// Mapping RecipePhotos
+	// menampilkan recipes photos dari DB
 	photoses, err := service.RecipePhotoRepository.Show(ctx, service.DB, int(recipe.ID))
 	if err != nil {
 		return dto.RecipeResponses{}, err
 	}
 
-	var photos []*dto.RecipePhotos
+	var photos []*dto.RecipePhotosResponse
 	for _, photo := range photoses {
-		photos = append(photos, &dto.RecipePhotos{
+		photos = append(photos, &dto.RecipePhotosResponse{
 			ID:   photo.ID,
 			Name: photo.Photo,
 		})
 	}
 
-	// Debugging dari postmant, untuk mengecek file yang diupload
-	for i, photo := range request.RecipePhotos {
-		log.Printf("Processing photo %d: %s\n", i, photo.Photo.Filename)
+	// Mapping Category
+	category, err := service.CategoryRepository.FindBySlug(ctx, service.DB, request.Slug)
+	if err != nil {
+		return dto.RecipeResponses{}, err
 	}
 
-	// Mapping Category
-	category := &dto.CategoryResponse{
-		ID:   recipe.Category.ID,
-		Name: recipe.Category.Name,
-		Slug: recipe.Category.Slug,
-		Icon: recipe.Category.Icon,
-	}
+	categoryResponse := dto.ToCategoryResponse(category)
 
 	response := dto.RecipeResponses{
-		ID:               recipe.ID,
-		Name:             recipe.Name,
-		Slug:             recipe.Slug,
-		Thumbnail:        recipe.Thumbnail,
-		CategoryResponse: category,
-		About:            recipe.About,
-		UrlFile:          recipe.UrlFile,
-		UrlVideo:         recipe.UrlVideo,
-		RecipePhotos:     photos,
+		ID:                   recipe.ID,
+		Name:                 recipe.Name,
+		Slug:                 recipe.Slug,
+		Thumbnail:            recipe.Thumbnail,
+		CategoryResponse:     &categoryResponse,
+		About:                recipe.About,
+		UrlFile:              recipe.UrlFile,
+		UrlVideo:             recipe.UrlVideo,
+		RecipePhotosResponse: photos,
 	}
 	// Log response in JSON format
 	responseJSON, _ := json.MarshalIndent(response, "", "  ")
