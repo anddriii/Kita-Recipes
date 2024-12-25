@@ -28,3 +28,15 @@ type RecipeResponseDetail struct {
 	RecipePhotos     []*RecipePhotos       `json:"photos"`
 	RecipeTutorials  []*Tutorials          `json:"tutorials"`
 }
+
+type RecipeResponseCreate struct {
+	ID                   int64                   `validate:"required" json:"id"`
+	Name                 string                  `validate:"required" json:"name"`
+	Slug                 string                  `json:"slug"`
+	Thumbnail            string                  `validate:"required" json:"thumbnail"`
+	About                string                  `validate:"required" json:"about"`
+	UrlFile              string                  `json:"url_file"`
+	UrlVideo             string                  `validate:"required" json:"url_video"`
+	CategoryResponse     *CategoryResponse       `json:"category"`
+	RecipePhotosResponse []*RecipePhotosResponse `json:"photos"`
+}

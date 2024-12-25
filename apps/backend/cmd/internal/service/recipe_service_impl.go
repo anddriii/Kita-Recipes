@@ -40,11 +40,11 @@ func NewRecipeService(recipeRepository repository.RecipeRespository, recipePhoto
 }
 
 // Save implements RecipeService.
-func (service *RecipeServiceImpl) Save(ctx context.Context, request dto.RecipeRequestCreate) (dto.RecipeResponses, error) {
+func (service *RecipeServiceImpl) Save(ctx context.Context, request dto.RecipeRequestCreate) (dto.RecipeResponseCreate, error) {
 	// Validasi request
 	err := service.Validate.Struct(request)
 	if err != nil {
-		return dto.RecipeResponses{}, err
+		return dto.RecipeResponseCreate{}, err
 	}
 
 	recipeName := domain.Recipe{
@@ -54,7 +54,7 @@ func (service *RecipeServiceImpl) Save(ctx context.Context, request dto.RecipeRe
 	// Path direktori utama
 	basePath, err := filepath.Abs("../../../assets/")
 	if err != nil {
-		return dto.RecipeResponses{}, fmt.Errorf("gagal memendapatkan path absolut: %w", err)
+		return dto.RecipeResponseCreate{}, fmt.Errorf("gagal memendapatkan path absolut: %w", err)
 	}
 
 	// Proses Thumbnail
@@ -63,7 +63,7 @@ func (service *RecipeServiceImpl) Save(ctx context.Context, request dto.RecipeRe
 	thumbnailPath := filepath.Join(basePath, "images", "recipes", "thumbnails", thumbnailFilename)
 
 	if err := saveFile(request.Thumbnail, thumbnailPath); err != nil {
-		return dto.RecipeResponses{}, fmt.Errorf("failed to save thumbnail: %w", err)
+		return dto.RecipeResponseCreate{}, fmt.Errorf("failed to save thumbnail: %w", err)
 	}
 
 	// Proses RecipePhotos
@@ -76,7 +76,7 @@ func (service *RecipeServiceImpl) Save(ctx context.Context, request dto.RecipeRe
 		log.Println("Saving photo to:", photoPath) // Debug log
 
 		if err := saveFile(&photo.Photo, photoPath); err != nil {
-			return dto.RecipeResponses{}, fmt.Errorf("failed to save photo: %w", err)
+			return dto.RecipeResponseCreate{}, fmt.Errorf("failed to save photo: %w", err)
 		}
 		photoFilenames = append(photoFilenames, photoFilename)
 	}
@@ -94,7 +94,7 @@ func (service *RecipeServiceImpl) Save(ctx context.Context, request dto.RecipeRe
 	}
 
 	if _, err := service.RecipeRepository.Save(ctx, service.DB, &recipe); err != nil {
-		return dto.RecipeResponses{}, err
+		return dto.RecipeResponseCreate{}, err
 	}
 
 	// Simpan RecipePhotos ke DB
@@ -104,14 +104,14 @@ func (service *RecipeServiceImpl) Save(ctx context.Context, request dto.RecipeRe
 			Photo:    filename,
 		}
 		if err := service.RecipePhotoRepository.Save(ctx, service.DB, photo); err != nil {
-			return dto.RecipeResponses{}, err
+			return dto.RecipeResponseCreate{}, err
 		}
 	}
 
 	// menampilkan recipes photos dari DB
 	photoses, err := service.RecipePhotoRepository.Show(ctx, service.DB, int(recipe.ID))
 	if err != nil {
-		return dto.RecipeResponses{}, err
+		return dto.RecipeResponseCreate{}, err
 	}
 
 	var photos []*dto.RecipePhotosResponse
@@ -125,12 +125,12 @@ func (service *RecipeServiceImpl) Save(ctx context.Context, request dto.RecipeRe
 	// Mapping Category
 	category, err := service.CategoryRepository.FindById(ctx, service.DB, request.CategoryId)
 	if err != nil {
-		return dto.RecipeResponses{}, err
+		return dto.RecipeResponseCreate{}, err
 	}
 
 	categoryResponse := dto.ToCategoryResponse(category)
 
-	response := dto.RecipeResponses{
+	response := dto.RecipeResponseCreate{
 		ID:                   recipe.ID,
 		Name:                 recipe.Name,
 		Slug:                 recipe.Slug,

@@ -7,5 +7,6 @@ func ToCategoryResponse(category domain.CategoryDetail) CategoryResponse {
 		ID:   category.ID,
 		Name: category.Name,
 		Icon: category.Icon,
+		Slug: category.Slug,
 	}
 }
