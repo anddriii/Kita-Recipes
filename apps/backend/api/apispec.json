@@ -564,7 +564,7 @@
                 "summary": "POST Recipes",
                 "description": "Post Recipes",
                 "responses": {
-                    "200":{
+                    "201":{
                         "description": "Succes Add Recipe",
                         "content": {
                             "application/json":{
