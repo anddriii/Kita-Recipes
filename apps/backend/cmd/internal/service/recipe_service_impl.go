@@ -122,6 +122,13 @@ func (service *RecipeServiceImpl) Save(ctx context.Context, request dto.RecipeRe
 		})
 	}
 
+	// Mapping Author
+	author := &dto.AuthorResponses{
+		ID:    recipe.RecipeAuthorId,
+		Name:  recipe.RecipeAuthor.Name,
+		Photo: recipe.RecipeAuthor.Photo,
+	}
+
 	// Mapping Category
 	category, err := service.CategoryRepository.FindById(ctx, service.DB, request.CategoryId)
 	if err != nil {
@@ -140,6 +147,7 @@ func (service *RecipeServiceImpl) Save(ctx context.Context, request dto.RecipeRe
 		UrlFile:              recipe.UrlFile,
 		UrlVideo:             recipe.UrlVideo,
 		RecipePhotosResponse: photos,
+		Author:               author,
 	}
 	// Log response in JSON format
 	responseJSON, _ := json.MarshalIndent(response, "", "  ")
@@ -148,45 +156,16 @@ func (service *RecipeServiceImpl) Save(ctx context.Context, request dto.RecipeRe
 	return response, nil
 }
 
-func saveFile(fileHeader *multipart.FileHeader, filePath string) error {
-	dir := filepath.Dir(filePath)
-
-	// Pastikan direktori ada
-	if err := os.MkdirAll(dir, os.ModePerm); err != nil {
-		return fmt.Errorf("failed to create directory: %w", err)
-	}
-
-	file, err := fileHeader.Open()
-	if err != nil {
-		return fmt.Errorf("failed to open file: %w", err)
-	}
-	defer file.Close()
-
-	out, err := os.Create(filePath)
-	if err != nil {
-		return fmt.Errorf("failed to create file: %w", err)
-	}
-	defer out.Close()
-
-	_, err = io.Copy(out, file)
-	if err != nil {
-		return fmt.Errorf("failed to copy file: %w", err)
-	}
-
-	log.Println("File saved successfully:", filePath)
-	return nil
-}
-
 // Update implements RecipeService.
-func (service *RecipeServiceImpl) Update(ctx context.Context, request dto.RecipeRequestUpdate) (dto.RecipeResponseDetail, error) {
+func (service *RecipeServiceImpl) Update(ctx context.Context, request dto.RecipeRequestUpdate) (dto.RecipeResponseUpdate, error) {
 	err := service.Validate.Struct(request)
 	if err != nil {
-		return dto.RecipeResponseDetail{}, err
+		return dto.RecipeResponseUpdate{}, err
 	}
 
 	recipe, err := service.RecipeRepository.FindById(ctx, service.DB, int(request.ID))
 	if err != nil {
-		return dto.RecipeResponseDetail{}, err
+		return dto.RecipeResponseUpdate{}, err
 	}
 
 	newSlug := utils.Slugify(request.Name)
@@ -199,30 +178,23 @@ func (service *RecipeServiceImpl) Update(ctx context.Context, request dto.Recipe
 	recipe.CategoryId = int64(request.CategoryId)
 	recipe.RecipeAuthorId = int64(request.RecipeAuthorId)
 
+	// Path direktori utama
+	basePath, err := filepath.Abs("../../../assets/")
+	if err != nil {
+		return dto.RecipeResponseUpdate{}, fmt.Errorf("gagal memendapatkan path absolut: %w", err)
+	}
+
 	//update foto
 	if request.Thumbnail != nil {
 		// Generate nama file baru
 		filename := uuid.New().String() + "-" + recipe.Name + "." +
 			strings.Split(request.Thumbnail.Filename, ".")[len(strings.Split(request.Thumbnail.Filename, "."))-1]
 
-		// Buka file yang di-upload
-		file, err := request.Thumbnail.Open()
-		if err != nil {
-			return dto.RecipeResponseDetail{}, err
-		}
-		defer file.Close()
+		// menyimpan foto update
+		thumbnailPath := filepath.Join(basePath, "images", "recipes", "thumbnails", filename)
 
-		// Simpan file ke direktori
-		filePath := "storage/images/recipes/" + filename
-		out, err := os.Create(filePath)
-		if err != nil {
-			return dto.RecipeResponseDetail{}, err
-		}
-		defer out.Close()
-
-		_, err = io.Copy(out, file)
-		if err != nil {
-			return dto.RecipeResponseDetail{}, err
+		if err := saveFile(request.Thumbnail, thumbnailPath); err != nil {
+			return dto.RecipeResponseUpdate{}, fmt.Errorf("failed to save thumbnail: %w", err)
 		}
 
 		// Assign path foto baru ke author
@@ -234,9 +206,37 @@ func (service *RecipeServiceImpl) Update(ctx context.Context, request dto.Recipe
 		// }
 	}
 
+	if request.RecipePhotos != nil {
+		// Proses RecipePhotos
+		var photoFilenames []string
+		for _, photo := range request.RecipePhotos {
+			photoFilename := uuid.New().String() + "-" + recipe.Name + "." +
+				strings.Split(photo.Photo.Filename, ".")[len(strings.Split(photo.Photo.Filename, "."))-1]
+			photoPath := filepath.Join(basePath, "images", "recipes", "recipes_photos", photoFilename)
+
+			log.Println("Saving photo to:", photoPath) // Debug log
+
+			if err := saveFile(&photo.Photo, photoPath); err != nil {
+				return dto.RecipeResponseUpdate{}, fmt.Errorf("failed to save photo: %w", err)
+			}
+			photoFilenames = append(photoFilenames, photoFilename)
+		}
+
+		// Simpan RecipePhotos ke DB
+		for _, filename := range photoFilenames {
+			photo := domain.Photo{
+				RecipeId: recipe.ID,
+				Photo:    filename,
+			}
+			if err := service.RecipePhotoRepository.Save(ctx, service.DB, photo); err != nil {
+				return dto.RecipeResponseUpdate{}, err
+			}
+		}
+	}
+
 	recipeDetail, err := service.RecipeRepository.Update(ctx, service.DB, &recipe)
 	if err != nil {
-		return dto.RecipeResponseDetail{}, err
+		return dto.RecipeResponseUpdate{}, err
 	}
 
 	// Mapping Category
@@ -272,16 +272,16 @@ func (service *RecipeServiceImpl) Update(ctx context.Context, request dto.Recipe
 		})
 	}
 
-	var photos []*dto.RecipePhotos
+	var photos []*dto.RecipePhotosResponse
 	for _, photo := range recipeDetail.RecipePhoto {
-		photos = append(photos, &dto.RecipePhotos{
-			ID: photo.ID,
-			// Photo: photo.Photo,
+		photos = append(photos, &dto.RecipePhotosResponse{
+			ID:   photo.ID,
+			Name: photo.Photo,
 		})
 	}
 
 	// Build the response
-	response := dto.RecipeResponseDetail{
+	response := dto.RecipeResponseUpdate{
 		ID:               recipeDetail.ID,
 		Name:             recipeDetail.Name,
 		Slug:             recipeDetail.Slug,
@@ -303,6 +303,35 @@ func (service *RecipeServiceImpl) Update(ctx context.Context, request dto.Recipe
 	log.Println(string(responseJSON))
 
 	return response, nil
+}
+
+func saveFile(fileHeader *multipart.FileHeader, filePath string) error {
+	dir := filepath.Dir(filePath)
+
+	// Pastikan direktori ada
+	if err := os.MkdirAll(dir, os.ModePerm); err != nil {
+		return fmt.Errorf("failed to create directory: %w", err)
+	}
+
+	file, err := fileHeader.Open()
+	if err != nil {
+		return fmt.Errorf("failed to open file: %w", err)
+	}
+	defer file.Close()
+
+	out, err := os.Create(filePath)
+	if err != nil {
+		return fmt.Errorf("failed to create file: %w", err)
+	}
+	defer out.Close()
+
+	_, err = io.Copy(out, file)
+	if err != nil {
+		return fmt.Errorf("failed to copy file: %w", err)
+	}
+
+	log.Println("File saved successfully:", filePath)
+	return nil
 }
 
 // Delete implements RecipeService.

@@ -87,6 +87,15 @@ func (controller *RecipeController) Create(c *fiber.Ctx) error {
 
 // Update Recipe
 func (controller *RecipeController) Update(c *fiber.Ctx) error {
+
+	// Parsing fields from multipart form
+	thumbnail, err := c.FormFile("thumbnail")
+	if err != nil {
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"error": "Thumbnail is required",
+		})
+	}
+
 	var request dto.RecipeRequestUpdate
 	id, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
@@ -102,6 +111,27 @@ func (controller *RecipeController) Update(c *fiber.Ctx) error {
 		})
 	}
 
+	request.Thumbnail = thumbnail
+
+	// Parse "photos" (array of files)
+	form, err := c.MultipartForm() // Inisialisasi variabel form
+	if err != nil {
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"error": "Failed to parse multipart form",
+		})
+	}
+
+	photos := form.File["photos"] // Get array of photos
+	if len(photos) > 0 {
+		var photoUploads []dto.RecipePhotos
+		for _, photo := range photos {
+			photoUploads = append(photoUploads, dto.RecipePhotos{
+				Photo: *photo,
+			})
+		}
+		request.RecipePhotos = photoUploads
+	}
+
 	response, err := controller.RecipeService.Update(c.Context(), request)
 	if err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
@@ -109,7 +139,7 @@ func (controller *RecipeController) Update(c *fiber.Ctx) error {
 		})
 	}
 
-	return c.Status(http.StatusOK).JSON(response)
+	return c.Status(http.StatusCreated).JSON(response)
 }
 
 // Get Recipe By ID
