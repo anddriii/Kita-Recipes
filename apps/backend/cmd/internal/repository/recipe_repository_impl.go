@@ -2,6 +2,8 @@ package repository
 
 import (
 	"context"
+	"errors"
+	"log"
 
 	"github.com/anddriii/KitaRecipes/cmd/internal/model/domain"
 	"gorm.io/gorm"
@@ -45,9 +47,12 @@ func (repository *RecipeRespositoryImpl) Update(ctx context.Context, db *gorm.DB
 			"Ingredients":    recipe.Ingredients,
 		}).Error
 	if err != nil {
-		tx.Rollback() // Batalkan transaksi
+		// Batalkan transaksi
+		tx.Rollback()
 		return *recipe, err
 	}
+
+	log.Println("cek category id", recipe.CategoryId)
 
 	// Hapus relasi lama
 	err = tx.Where("recipe_id = ?", recipe.ID).Delete(&domain.Photo{}).Error
@@ -60,6 +65,22 @@ func (repository *RecipeRespositoryImpl) Update(ctx context.Context, db *gorm.DB
 	if err != nil {
 		tx.Rollback()
 		return *recipe, err
+	}
+
+	var count int64
+	if err := db.Model(&domain.Categories{}).Where("id = ?", recipe.CategoryId).Count(&count).Error; err != nil {
+		return *recipe, err
+	}
+	if count == 0 {
+		return *recipe, errors.New("invalid category_id: category does not exist")
+	}
+
+	//debuging category
+	log.Printf("Updating Recipe ID: %d with Category ID: %d", recipe.ID, recipe.CategoryId)
+
+	//mengecek jika category adalah null
+	if recipe.CategoryId == 0 {
+		return *recipe, errors.New("CategoryId cannot be zero or null")
 	}
 
 	// Tambahkan relasi baru
