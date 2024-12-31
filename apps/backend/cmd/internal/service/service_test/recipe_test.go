@@ -25,7 +25,8 @@ func TestRecipeSave(t *testing.T) {
 	recipe := repository.NewRecipeRepository()
 	recipePhotoRepository := repository.NewRecipePhotoRepository()
 	categoryRepo := repository.NewCategoryRepository()
-	recipeService := service.NewRecipeService(recipe, recipePhotoRepository, categoryRepo, db, validate)
+	authorRepo := repository.NewAuthorRepository()
+	recipeService := service.NewRecipeService(recipe, recipePhotoRepository, categoryRepo, authorRepo, db, validate)
 
 	// Pastikan direktori storage/images ada sebelum test
 	absolutePath, err := filepath.Abs("storage/images/categories/")
@@ -69,7 +70,8 @@ func TestFindByIdRecipe(t *testing.T) {
 	repo := repository.NewRecipeRepository()
 	recipePhotoRepository := repository.NewRecipePhotoRepository()
 	categoryRepo := repository.NewCategoryRepository()
-	service := service.NewRecipeService(repo, recipePhotoRepository, categoryRepo, db, validate)
+	authorRepo := repository.NewAuthorRepository()
+	service := service.NewRecipeService(repo, recipePhotoRepository, categoryRepo, authorRepo, db, validate)
 
 	ctx := context.Background()
 	author, err := service.FindById(ctx, 77)
@@ -86,7 +88,8 @@ func TestUpdateRecipe(t *testing.T) {
 	repo := repository.NewRecipeRepository()
 	recipePhotoRepository := repository.NewRecipePhotoRepository()
 	categoryRepo := repository.NewCategoryRepository()
-	service := service.NewRecipeService(repo, recipePhotoRepository, categoryRepo, db, validate)
+	authorRepo := repository.NewAuthorRepository()
+	service := service.NewRecipeService(repo, recipePhotoRepository, categoryRepo, authorRepo, db, validate)
 
 	var initialRecipe domain.Recipe
 	result := db.Where("id = ?", 12).First(&initialRecipe)
@@ -156,7 +159,8 @@ func TestDeleteRecipe(t *testing.T) {
 	repo := repository.NewRecipeRepository()
 	recipePhotoRepository := repository.NewRecipePhotoRepository()
 	categoryRepo := repository.NewCategoryRepository()
-	service := service.NewRecipeService(repo, recipePhotoRepository, categoryRepo, db, validate)
+	authorRepo := repository.NewAuthorRepository()
+	service := service.NewRecipeService(repo, recipePhotoRepository, categoryRepo, authorRepo, db, validate)
 
 	ctx := context.Background()
 	service.Delete(ctx, 33)
@@ -173,7 +177,8 @@ func TestFindAllRecipes(t *testing.T) {
 	repo := repository.NewRecipeRepository()
 	recipePhotoRepository := repository.NewRecipePhotoRepository()
 	categoryRepo := repository.NewCategoryRepository()
-	service := service.NewRecipeService(repo, recipePhotoRepository, categoryRepo, db, validate)
+	authorRepo := repository.NewAuthorRepository()
+	service := service.NewRecipeService(repo, recipePhotoRepository, categoryRepo, authorRepo, db, validate)
 
 	ctx := context.Background()
 	recipes, err := service.FindAll(ctx)
