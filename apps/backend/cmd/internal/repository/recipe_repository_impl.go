@@ -82,13 +82,6 @@ func (repository *RecipeRespositoryImpl) Update(ctx context.Context, db *gorm.DB
 		return *recipe, err
 	}
 
-	// // Hapus relasi lama
-	// err = tx.Where("recipe_id = ?", recipe.ID).Delete(&domain.Photo{}).Error
-	// if err != nil {
-	// 	tx.Rollback()
-	// 	return *recipe, err
-	// }
-
 	err = tx.Where("recipe_id = ?", recipe.ID).Delete(&domain.RecipeTutorial{}).Error
 	if err != nil {
 		tx.Rollback()
