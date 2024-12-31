@@ -25,14 +25,16 @@ type RecipeServiceImpl struct {
 	RecipeRepository      repository.RecipeRespository
 	CategoryRepository    repository.CategoryRepository
 	RecipePhotoRepository repository.RecipePhotoRepository
+	AuthorRepository      repository.AuthorRepository
 	DB                    *gorm.DB
 	Validate              *validator.Validate
 }
 
-func NewRecipeService(recipeRepository repository.RecipeRespository, recipePhoto repository.RecipePhotoRepository, categoryRepository repository.CategoryRepository, DB *gorm.DB, validate *validator.Validate) RecipeService {
+func NewRecipeService(recipeRepository repository.RecipeRespository, recipePhoto repository.RecipePhotoRepository, categoryRepository repository.CategoryRepository, authorRepository repository.AuthorRepository, DB *gorm.DB, validate *validator.Validate) RecipeService {
 	return &RecipeServiceImpl{
 		RecipeRepository:      recipeRepository,
 		CategoryRepository:    categoryRepository,
+		AuthorRepository:      authorRepository,
 		RecipePhotoRepository: recipePhoto,
 		DB:                    DB,
 		Validate:              validate,
@@ -242,19 +244,20 @@ func (service *RecipeServiceImpl) Update(ctx context.Context, request dto.Recipe
 	}
 
 	// Mapping Category
-	category := &dto.CategoryResponse{
-		ID:   recipeDetail.Category.ID,
-		Name: recipeDetail.Category.Name,
-		Slug: recipeDetail.Category.Slug,
-		Icon: recipeDetail.Category.Icon,
+	category, err := service.CategoryRepository.FindById(ctx, service.DB, request.CategoryId)
+	if err != nil {
+		return dto.RecipeResponseUpdate{}, err
 	}
+	// category domain to category response
+	categoryResponse := dto.ToCategoryResponse(category)
 
 	// Mapping Author
-	author := &dto.AuthorResponses{
-		ID:    recipeDetail.RecipeAuthor.ID,
-		Name:  recipeDetail.RecipeAuthor.Name,
-		Photo: recipeDetail.RecipeAuthor.Photo,
+	author, err := service.AuthorRepository.FindById(ctx, service.DB, request.RecipeAuthorId)
+	if err != nil {
+		return dto.RecipeResponseUpdate{}, err
 	}
+	// author domain to author response
+	authorResponse := dto.ToAuthorResponse(author)
 
 	// Mapping Ingredients
 	var ingredients []*dto.IngredientResponse
@@ -293,8 +296,8 @@ func (service *RecipeServiceImpl) Update(ctx context.Context, request dto.Recipe
 		About:            recipeDetail.About,
 		RecipeTutorials:  tutorials,
 		Ingredients:      ingredients,
-		CategoryResponse: category,
-		Author:           author,
+		CategoryResponse: &categoryResponse,
+		Author:           &authorResponse,
 		RecipePhotos:     photos,
 	}
 
