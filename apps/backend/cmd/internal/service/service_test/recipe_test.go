@@ -89,7 +89,7 @@ func TestUpdateRecipe(t *testing.T) {
 	service := service.NewRecipeService(repo, recipePhotoRepository, categoryRepo, db, validate)
 
 	var initialRecipe domain.Recipe
-	result := db.Where("id = ?", 128).First(&initialRecipe)
+	result := db.Where("id = ?", 12).First(&initialRecipe)
 	assert.Nil(t, result.Error)
 
 	// // Seed initial data
@@ -110,17 +110,18 @@ func TestUpdateRecipe(t *testing.T) {
 	fileHeader, err := createTestFileHeaderFromBuffer("thumbnail.jpg", fileContent)
 	require.NoError(t, err, "Gagal membuat file header dari buffer")
 
+	var updatedRecipe domain.Recipe
 	// Prepare update request
 	updateRequest := &dto.RecipeRequestUpdate{
 		ID:             initialRecipe.ID,
-		Name:           "Cara bikin Jus mangga by Kafka",
+		Name:           "Cara bikin Jus mangga by Kafkaaaa",
 		Slug:           initialRecipe.Slug,
 		Thumbnail:      fileHeader,
 		About:          "Semoga tidak error, pleasseeee",
 		UrlFile:        "Update file",
 		UrlVideo:       "update video",
-		CategoryId:     3,
-		RecipeAuthorId: 2,
+		CategoryId:     5,
+		RecipeAuthorId: 7,
 	}
 
 	// Call Update service
@@ -129,7 +130,7 @@ func TestUpdateRecipe(t *testing.T) {
 	assert.Nil(t, err, "Service Update gagal")
 
 	// Validate updated data in database
-	// var updatedRecipe domain.Recipe
+
 	// result = db.Where("id = ?", initialRecipe.ID).First(&updatedRecipe)
 	// assert.Nil(t, result.Error)
 
@@ -139,7 +140,7 @@ func TestUpdateRecipe(t *testing.T) {
 	// assert.Equal(t, expectedSlug, updatedRecipe.Slug)
 	// assert.Equal(t, "Update file", updatedRecipe.UrlFile)
 	// assert.Equal(t, "update video", updatedRecipe.UrlVideo)
-	// assert.Equal(t, updateRequest.CategoryId, updatedRecipe.CategoryId)
+	assert.Equal(t, updateRequest.CategoryId, updatedRecipe.CategoryId)
 	// assert.Equal(t, updateRequest.RecipeAuthorId, updatedRecipe.RecipeAuthorId)
 
 	// // Optional: Validate thumbnail

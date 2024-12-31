@@ -27,9 +27,45 @@ func (repository *RecipeRespositoryImpl) Save(ctx context.Context, db *gorm.DB, 
 
 func (repository *RecipeRespositoryImpl) Update(ctx context.Context, db *gorm.DB, recipe *domain.RecipeDetail) (domain.RecipeDetail, error) {
 	// Mulai transaksi
+	log.Println("== DEBUG PAYLOAD ==")
+	log.Printf("ID: %d", recipe.ID)
+	log.Printf("Name: %s", recipe.Name)
+	log.Printf("CategoryId: %d", recipe.CategoryId)
+
+	log.Printf("CategoryId from Payload: %d", recipe.CategoryId)
 	tx := db.WithContext(ctx).Begin()
 	if err := tx.Error; err != nil {
 		return *recipe, err
+	}
+	// if err := tx.Model(&domain.Categories{}).Where("id = ?", recipe.CategoryId).Updates(domain.Categories{
+	// 	ID: recipe.CategoryId,
+	// }).Error; err != nil {
+	// 	tx.Rollback()
+	// 	return *recipe, err
+	// }
+	log.Printf("CategoryId di Repository sebelum update: %d", recipe.CategoryId)
+
+	//debuging category
+	log.Printf("Updating Recipe ID: %d with Category ID: %d", recipe.ID, recipe.CategoryId)
+	log.Println("cek category id repository", recipe.CategoryId)
+
+	// Validasi CategoryId di API Layer
+	if recipe.CategoryId == 0 {
+		return *recipe, errors.New("CategoryId cannot be zero")
+	}
+
+	// Validasi category di database
+	var categoryCount int64
+	if err := db.Model(&domain.Categories{}).Where("id = ?", recipe.CategoryId).Count(&categoryCount).Error; err != nil {
+		return *recipe, err
+	}
+	if categoryCount == 0 {
+		return *recipe, errors.New("CategoryId does not exist in categories table")
+	}
+
+	//mengecek jika category adalah null
+	if recipe.CategoryId == 0 {
+		return *recipe, errors.New("CategoryId cannot be zero or null")
 	}
 
 	// Update data utama
@@ -52,8 +88,6 @@ func (repository *RecipeRespositoryImpl) Update(ctx context.Context, db *gorm.DB
 		return *recipe, err
 	}
 
-	log.Println("cek category id", recipe.CategoryId)
-
 	// Hapus relasi lama
 	err = tx.Where("recipe_id = ?", recipe.ID).Delete(&domain.Photo{}).Error
 	if err != nil {
@@ -65,22 +99,6 @@ func (repository *RecipeRespositoryImpl) Update(ctx context.Context, db *gorm.DB
 	if err != nil {
 		tx.Rollback()
 		return *recipe, err
-	}
-
-	var count int64
-	if err := db.Model(&domain.Categories{}).Where("id = ?", recipe.CategoryId).Count(&count).Error; err != nil {
-		return *recipe, err
-	}
-	if count == 0 {
-		return *recipe, errors.New("invalid category_id: category does not exist")
-	}
-
-	//debuging category
-	log.Printf("Updating Recipe ID: %d with Category ID: %d", recipe.ID, recipe.CategoryId)
-
-	//mengecek jika category adalah null
-	if recipe.CategoryId == 0 {
-		return *recipe, errors.New("CategoryId cannot be zero or null")
 	}
 
 	// Tambahkan relasi baru

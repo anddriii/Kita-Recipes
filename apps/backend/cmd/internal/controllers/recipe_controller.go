@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"log"
 	"net/http"
 	"strconv"
 
@@ -106,10 +107,27 @@ func (controller *RecipeController) Update(c *fiber.Ctx) error {
 
 	request.ID = int64(id)
 	if err := c.BodyParser(&request); err != nil {
+		log.Printf("Error BodyParser: %v", err)
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
 			"error": err.Error(),
 		})
 	}
+
+	authorIdStr := c.FormValue("recipe_author_id")
+	authorId, err := strconv.Atoi(authorIdStr)
+	if err != nil {
+		log.Printf("Error Parsing category_id: %v", err)
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid category_id",
+		})
+	}
+	request.RecipeAuthorId = authorId
+
+	// Debug nilai setelah manual parsing
+	log.Printf("Manual Parsed CategoryId: %d", request.CategoryId)
+
+	//debug perser
+	log.Printf("Parsed Request: %+v", request)
 
 	request.Thumbnail = thumbnail
 

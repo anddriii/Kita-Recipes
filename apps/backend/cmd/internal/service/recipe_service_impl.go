@@ -234,6 +234,8 @@ func (service *RecipeServiceImpl) Update(ctx context.Context, request dto.Recipe
 		}
 	}
 
+	log.Println("recipe category id request", request.CategoryId)
+
 	recipeDetail, err := service.RecipeRepository.Update(ctx, service.DB, &recipe)
 	if err != nil {
 		return dto.RecipeResponseUpdate{}, err
@@ -297,6 +299,7 @@ func (service *RecipeServiceImpl) Update(ctx context.Context, request dto.Recipe
 	}
 
 	log.Printf("Recipe to save: %+v", recipe)
+	log.Printf("CategoryId di Service: %d", request.CategoryId)
 
 	// Log response in JSON format
 	responseJSON, _ := json.MarshalIndent(response, "", "  ")

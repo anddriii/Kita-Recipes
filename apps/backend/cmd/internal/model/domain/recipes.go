@@ -5,12 +5,12 @@ import (
 )
 
 type Recipe struct {
-	ID             int64  `gorm:"primaryKey:autoIncrement" json:"id"`
-	Name           string `json:"name"`
-	Slug           string `json:"slug"`
-	Thumbnail      string `json:"thumbnail"`
-	About          string `json:"about"`
-	CategoryId     int64
+	ID             int64      `gorm:"primaryKey:autoIncrement" json:"id"`
+	Name           string     `json:"name"`
+	Slug           string     `json:"slug"`
+	Thumbnail      string     `json:"thumbnail"`
+	About          string     `json:"about"`
+	CategoryId     int64      `gorm:"column:category_id" json:"category_id"`
 	Category       Categories `gorm:"foreignKey:CategoryId;references:id"`
 	RecipeAuthorId int64
 	RecipeAuthor   RecipeAuthor `gorm:"foreignKey:recipe_author_id;references:id"`
@@ -24,12 +24,12 @@ type Recipe struct {
 }
 
 type RecipeDetail struct {
-	ID             int64  `gorm:"primaryKey:autoIncrement" json:"id"`
-	Name           string `json:"name"`
-	Slug           string `json:"slug"`
-	Thumbnail      string `json:"thumbnail"`
-	About          string `json:"about"`
-	CategoryId     int64
+	ID             int64            `gorm:"primaryKey:autoIncrement" json:"id"`
+	Name           string           `json:"name"`
+	Slug           string           `json:"slug"`
+	Thumbnail      string           `json:"thumbnail"`
+	About          string           `json:"about"`
+	CategoryId     int64            `form:"category_id" json:"category_id"`
 	Category       Categories       `gorm:"foreignKey:CategoryId;references:id"`
 	RecipeAuthorId int64            `gorm:"column:recipe_author_id"`
 	RecipeAuthor   RecipeAuthor     `gorm:"foreignKey:recipe_author_id;references:id"`
