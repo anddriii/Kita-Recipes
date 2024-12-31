@@ -37,12 +37,6 @@ func (repository *RecipeRespositoryImpl) Update(ctx context.Context, db *gorm.DB
 	if err := tx.Error; err != nil {
 		return *recipe, err
 	}
-	// if err := tx.Model(&domain.Categories{}).Where("id = ?", recipe.CategoryId).Updates(domain.Categories{
-	// 	ID: recipe.CategoryId,
-	// }).Error; err != nil {
-	// 	tx.Rollback()
-	// 	return *recipe, err
-	// }
 	log.Printf("CategoryId di Repository sebelum update: %d", recipe.CategoryId)
 
 	//debuging category
@@ -88,26 +82,17 @@ func (repository *RecipeRespositoryImpl) Update(ctx context.Context, db *gorm.DB
 		return *recipe, err
 	}
 
-	// Hapus relasi lama
-	err = tx.Where("recipe_id = ?", recipe.ID).Delete(&domain.Photo{}).Error
-	if err != nil {
-		tx.Rollback()
-		return *recipe, err
-	}
+	// // Hapus relasi lama
+	// err = tx.Where("recipe_id = ?", recipe.ID).Delete(&domain.Photo{}).Error
+	// if err != nil {
+	// 	tx.Rollback()
+	// 	return *recipe, err
+	// }
 
 	err = tx.Where("recipe_id = ?", recipe.ID).Delete(&domain.RecipeTutorial{}).Error
 	if err != nil {
 		tx.Rollback()
 		return *recipe, err
-	}
-
-	// Tambahkan relasi baru
-	for _, photo := range recipe.RecipePhoto {
-		photo.RecipeId = recipe.ID
-		if err := tx.Create(&photo).Error; err != nil {
-			tx.Rollback()
-			return *recipe, err
-		}
 	}
 
 	for _, tutorial := range recipe.RecipeTutorial {

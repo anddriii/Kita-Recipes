@@ -219,21 +219,19 @@ func (service *RecipeServiceImpl) Update(ctx context.Context, request dto.Recipe
 			log.Println("Saving photo to:", photoPath) // Debug log
 
 			if err := saveFile(&photo.Photo, photoPath); err != nil {
+
 				return dto.RecipeResponseUpdate{}, fmt.Errorf("failed to save photo: %w", err)
 			}
 			photoFilenames = append(photoFilenames, photoFilename)
 		}
 
-		// Simpan RecipePhotos ke DB
-		for _, filename := range photoFilenames {
-			photo := domain.Photo{
-				RecipeId: recipe.ID,
-				Photo:    filename,
-			}
-			if err := service.RecipePhotoRepository.Save(ctx, service.DB, photo); err != nil {
-				return dto.RecipeResponseUpdate{}, err
-			}
+		// Simpan foto ke database sekali saja
+		log.Println("Attempting to save photos in bulk")
+		if err := service.RecipePhotoRepository.Update(ctx, service.DB, int(request.ID), photoFilenames); err != nil {
+			log.Printf("Failed to save photos: %v", err)
+			return dto.RecipeResponseUpdate{}, err
 		}
+		log.Println("All photos saved successfully")
 	}
 
 	log.Println("recipe category id request", request.CategoryId)
@@ -250,6 +248,20 @@ func (service *RecipeServiceImpl) Update(ctx context.Context, request dto.Recipe
 	}
 	// category domain to category response
 	categoryResponse := dto.ToCategoryResponse(category)
+
+	//mappin photos
+	photoses, err := service.RecipePhotoRepository.Show(ctx, service.DB, int(recipe.ID))
+	if err != nil {
+		return dto.RecipeResponseUpdate{}, err
+	}
+
+	var photos []*dto.RecipePhotosResponse
+	for _, photo := range photoses {
+		photos = append(photos, &dto.RecipePhotosResponse{
+			ID:   photo.ID,
+			Name: photo.Photo,
+		})
+	}
 
 	// Mapping Author
 	author, err := service.AuthorRepository.FindById(ctx, service.DB, request.RecipeAuthorId)
@@ -274,14 +286,6 @@ func (service *RecipeServiceImpl) Update(ctx context.Context, request dto.Recipe
 		tutorials = append(tutorials, &dto.Tutorials{
 			ID:   tutorial.ID,
 			Name: tutorial.Name,
-		})
-	}
-
-	var photos []*dto.RecipePhotosResponse
-	for _, photo := range recipeDetail.RecipePhoto {
-		photos = append(photos, &dto.RecipePhotosResponse{
-			ID:   photo.ID,
-			Name: photo.Photo,
 		})
 	}
 
