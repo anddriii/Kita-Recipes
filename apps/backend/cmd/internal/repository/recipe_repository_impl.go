@@ -17,7 +17,8 @@ func NewRecipeRepository() RecipeRespository {
 }
 
 func (repository *RecipeRespositoryImpl) Save(ctx context.Context, db *gorm.DB, recipe *domain.Recipe) (domain.Recipe, error) {
-	err := db.WithContext(ctx).Create(recipe).Error
+	// Simpan recipe tanpa tutorial terlebih dahulu
+	err := db.WithContext(ctx).Omit("RecipeTutorial").Create(recipe).Error
 	if err != nil {
 		return domain.Recipe{}, err
 	}
@@ -89,6 +90,15 @@ func (repository *RecipeRespositoryImpl) Update(ctx context.Context, db *gorm.DB
 	}
 
 	// Tambahkan tutorial baru
+	if len(recipe.RecipeTutorial) > 0 {
+		for i := range recipe.RecipeTutorial {
+			recipe.RecipeTutorial[i].RecipeId = recipe.ID
+		}
+		if err := tx.WithContext(ctx).Create(&recipe.RecipeTutorial).Error; err != nil {
+			tx.Rollback()
+			return *recipe, err
+		}
+	}
 
 	// Commit transaksi jika semuanya berhasil
 	if err := tx.Commit().Error; err != nil {

@@ -97,20 +97,25 @@ func (service *RecipeServiceImpl) Save(ctx context.Context, request dto.RecipeRe
 		RecipeAuthorId: int64(request.RecipeAuthorId),
 	}
 
-	// tutorial := request.Tutorials
-	// recipe.RecipeTutorial = append(recipe.RecipeTutorial, domain.RecipeTutorial{
-	// 	Name: tutorial.Name,
-	// })
-
-	// simopan tutorial ke DB
-	for _, t := range request.Tutorials {
-		recipe.RecipeTutorial = append(recipe.RecipeTutorial, domain.RecipeTutorial{
-			Name: t.Name,
-		})
-	}
-
 	if _, err := service.RecipeRepository.Save(ctx, service.DB, &recipe); err != nil {
 		return dto.RecipeResponseCreate{}, err
+	}
+
+	// Simpan tutorial ke DB
+	for _, t := range request.Tutorials {
+		tutorial := domain.RecipeTutorial{
+			Name:     t.Name,
+			RecipeId: recipe.ID,
+		}
+		recipe.RecipeTutorial = append(recipe.RecipeTutorial, tutorial)
+	}
+
+	// Simpan tutorial ke DB
+	for _, tutorial := range recipe.RecipeTutorial {
+		err := service.TutorialsRepository.Save(ctx, service.DB, tutorial)
+		if err != nil {
+			return dto.RecipeResponseCreate{}, err
+		}
 	}
 
 	// Simpan RecipePhotos ke DB
@@ -153,6 +158,22 @@ func (service *RecipeServiceImpl) Save(ctx context.Context, request dto.RecipeRe
 
 	categoryResponse := dto.ToCategoryResponse(category)
 
+	//mapping tutorials
+	tutorialsDb, err := service.TutorialsRepository.Show(ctx, service.DB, int(recipe.ID))
+	if err != nil {
+		return dto.RecipeResponseCreate{}, err
+	}
+
+	// tutorialResponse := dto.ToTutorialResponse(tutoriald)
+
+	var tutorialsRes []*dto.Tutorials
+	for _, tutorial := range tutorialsDb {
+		tutorialsRes = append(tutorialsRes, &dto.Tutorials{
+			ID:   tutorial.ID,
+			Name: tutorial.Name,
+		})
+	}
+
 	response := dto.RecipeResponseCreate{
 		ID:                   recipe.ID,
 		Name:                 recipe.Name,
@@ -164,6 +185,7 @@ func (service *RecipeServiceImpl) Save(ctx context.Context, request dto.RecipeRe
 		UrlVideo:             recipe.UrlVideo,
 		RecipePhotosResponse: photos,
 		Author:               author,
+		RecipeTutorials:      tutorialsRes,
 	}
 	// Log response in JSON format
 	responseJSON, _ := json.MarshalIndent(response, "", "  ")
@@ -252,6 +274,16 @@ func (service *RecipeServiceImpl) Update(ctx context.Context, request dto.Recipe
 			return dto.RecipeResponseUpdate{}, err
 		}
 		log.Println("All photos saved successfully")
+	}
+
+	//memperbarui tutorial
+	if request.Tutorials != nil {
+		recipe.RecipeTutorial = []domain.RecipeTutorial{}
+		for _, t := range request.Tutorials {
+			recipe.RecipeTutorial = append(recipe.RecipeTutorial, domain.RecipeTutorial{
+				Name: t.Name,
+			})
+		}
 	}
 
 	log.Println("recipe category id request", request.CategoryId)
