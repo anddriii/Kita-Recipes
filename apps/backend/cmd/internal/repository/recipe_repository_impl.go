@@ -82,19 +82,13 @@ func (repository *RecipeRespositoryImpl) Update(ctx context.Context, db *gorm.DB
 		return *recipe, err
 	}
 
-	err = tx.Where("recipe_id = ?", recipe.ID).Delete(&domain.RecipeTutorial{}).Error
-	if err != nil {
+	// Hapus tutorial lama
+	if err := tx.WithContext(ctx).Where("recipe_id = ?", recipe.ID).Delete(&domain.RecipeTutorial{}).Error; err != nil {
 		tx.Rollback()
 		return *recipe, err
 	}
 
-	for _, tutorial := range recipe.RecipeTutorial {
-		tutorial.RecipeId = recipe.ID
-		if err := tx.Create(&tutorial).Error; err != nil {
-			tx.Rollback()
-			return *recipe, err
-		}
-	}
+	// Tambahkan tutorial baru
 
 	// Commit transaksi jika semuanya berhasil
 	if err := tx.Commit().Error; err != nil {

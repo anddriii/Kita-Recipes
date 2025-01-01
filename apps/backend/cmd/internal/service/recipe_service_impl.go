@@ -26,16 +26,18 @@ type RecipeServiceImpl struct {
 	CategoryRepository    repository.CategoryRepository
 	RecipePhotoRepository repository.RecipePhotoRepository
 	AuthorRepository      repository.AuthorRepository
+	TutorialsRepository   repository.RecipeTutorials
 	DB                    *gorm.DB
 	Validate              *validator.Validate
 }
 
-func NewRecipeService(recipeRepository repository.RecipeRespository, recipePhoto repository.RecipePhotoRepository, categoryRepository repository.CategoryRepository, authorRepository repository.AuthorRepository, DB *gorm.DB, validate *validator.Validate) RecipeService {
+func NewRecipeService(recipeRepository repository.RecipeRespository, recipePhoto repository.RecipePhotoRepository, categoryRepository repository.CategoryRepository, authorRepository repository.AuthorRepository, tutorialsRepo repository.RecipeTutorials, DB *gorm.DB, validate *validator.Validate) RecipeService {
 	return &RecipeServiceImpl{
 		RecipeRepository:      recipeRepository,
 		CategoryRepository:    categoryRepository,
 		AuthorRepository:      authorRepository,
 		RecipePhotoRepository: recipePhoto,
+		TutorialsRepository:   tutorialsRepo,
 		DB:                    DB,
 		Validate:              validate,
 	}
@@ -93,6 +95,18 @@ func (service *RecipeServiceImpl) Save(ctx context.Context, request dto.RecipeRe
 		UrlVideo:       request.UrlVideo,
 		CategoryId:     int64(request.CategoryId),
 		RecipeAuthorId: int64(request.RecipeAuthorId),
+	}
+
+	// tutorial := request.Tutorials
+	// recipe.RecipeTutorial = append(recipe.RecipeTutorial, domain.RecipeTutorial{
+	// 	Name: tutorial.Name,
+	// })
+
+	// simopan tutorial ke DB
+	for _, t := range request.Tutorials {
+		recipe.RecipeTutorial = append(recipe.RecipeTutorial, domain.RecipeTutorial{
+			Name: t.Name,
+		})
 	}
 
 	if _, err := service.RecipeRepository.Save(ctx, service.DB, &recipe); err != nil {
@@ -180,6 +194,12 @@ func (service *RecipeServiceImpl) Update(ctx context.Context, request dto.Recipe
 	recipe.CategoryId = int64(request.CategoryId)
 	recipe.RecipeAuthorId = int64(request.RecipeAuthorId)
 
+	// mapping tutorial
+	for _, t := range request.Tutorials {
+		recipe.RecipeTutorial = append(recipe.RecipeTutorial, domain.RecipeTutorial{
+			Name: t.Name,
+		})
+	}
 	// Path direktori utama
 	basePath, err := filepath.Abs("../../../assets/")
 	if err != nil {
@@ -281,9 +301,17 @@ func (service *RecipeServiceImpl) Update(ctx context.Context, request dto.Recipe
 		})
 	}
 
-	var tutorials []*dto.Tutorials
-	for _, tutorial := range recipeDetail.RecipeTutorial {
-		tutorials = append(tutorials, &dto.Tutorials{
+	//mapping tutorials
+	tutorialsDb, err := service.TutorialsRepository.Show(ctx, service.DB, int(recipe.ID))
+	if err != nil {
+		return dto.RecipeResponseUpdate{}, err
+	}
+
+	// tutorialResponse := dto.ToTutorialResponse(tutoriald)
+
+	var tutorialsRes []*dto.Tutorials
+	for _, tutorial := range tutorialsDb {
+		tutorialsRes = append(tutorialsRes, &dto.Tutorials{
 			ID:   tutorial.ID,
 			Name: tutorial.Name,
 		})
@@ -298,7 +326,7 @@ func (service *RecipeServiceImpl) Update(ctx context.Context, request dto.Recipe
 		UrlVideo:         recipeDetail.UrlVideo,
 		Thumbnail:        recipeDetail.Thumbnail,
 		About:            recipeDetail.About,
-		RecipeTutorials:  tutorials,
+		RecipeTutorials:  tutorialsRes,
 		Ingredients:      ingredients,
 		CategoryResponse: &categoryResponse,
 		Author:           &authorResponse,

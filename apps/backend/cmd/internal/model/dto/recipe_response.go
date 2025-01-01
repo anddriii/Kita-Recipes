@@ -55,4 +55,5 @@ type RecipeResponseCreate struct {
 	CategoryResponse     *CategoryResponse       `json:"category"`
 	RecipePhotosResponse []*RecipePhotosResponse `json:"photos"`
 	Author               *AuthorResponses        `json:"author"`
+	RecipeTutorials      []*Tutorials            `json:"tutorials"`
 }

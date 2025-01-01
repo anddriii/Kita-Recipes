@@ -20,7 +20,8 @@ func main() {
 	recipeRepo := repository.NewRecipeRepository()
 	categoryRepo := repository.NewCategoryRepository()
 	authorRepo := repository.NewAuthorRepository()
-	recipeService := service.NewRecipeService(recipeRepo, recipePhotoRepository, categoryRepo, authorRepo, db, validator)
+	tutorialRepo := repository.NewRecipeTutorialsRepository()
+	recipeService := service.NewRecipeService(recipeRepo, recipePhotoRepository, categoryRepo, authorRepo, tutorialRepo, db, validator)
 	recipeController := controllers.NewRecipeController(recipeService)
 
 	// Routes

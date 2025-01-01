@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/anddriii/KitaRecipes/cmd/internal/model/dto"
 	"github.com/anddriii/KitaRecipes/cmd/internal/service"
@@ -75,6 +76,14 @@ func (controller *RecipeController) Create(c *fiber.Ctx) error {
 		request.RecipePhotos = photoUploads
 	}
 
+	tutorialNames := c.FormValue("tutorials")
+	if tutorialNames != "" {
+		tutorialList := strings.Split(tutorialNames, ",") // Asumsikan format: "Tutorial 1,Tutorial 2"
+		for _, name := range tutorialList {
+			request.Tutorials = append(request.Tutorials, dto.Tutorials{Name: name})
+		}
+	}
+
 	// Call Service Layer
 	response, err := controller.RecipeService.Save(c.Context(), request)
 	if err != nil {
@@ -111,6 +120,15 @@ func (controller *RecipeController) Update(c *fiber.Ctx) error {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
 			"error": err.Error(),
 		})
+	}
+
+	// menangkap data tutorials
+	tutorialNames := c.FormValue("tutorials")
+	if tutorialNames != "" {
+		tutorialList := strings.Split(tutorialNames, ",") // Asumsikan format: "Tutorial 1,Tutorial 2"
+		for _, name := range tutorialList {
+			request.Tutorials = append(request.Tutorials, dto.Tutorials{Name: name})
+		}
 	}
 
 	authorIdStr := c.FormValue("recipe_author_id")
