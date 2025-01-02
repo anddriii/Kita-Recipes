@@ -32,6 +32,7 @@ func (repository *RecipeRespositoryImpl) Update(ctx context.Context, db *gorm.DB
 	log.Printf("ID: %d", recipe.ID)
 	log.Printf("Name: %s", recipe.Name)
 	log.Printf("CategoryId: %d", recipe.CategoryId)
+	log.Print("File name: ", recipe.UrlFile)
 
 	log.Printf("CategoryId from Payload: %d", recipe.CategoryId)
 	tx := db.WithContext(ctx).Begin()

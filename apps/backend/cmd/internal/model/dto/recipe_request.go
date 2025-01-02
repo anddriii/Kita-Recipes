@@ -21,7 +21,7 @@ type RecipeRequestUpdate struct {
 	Slug           string                `json:"slug"`
 	Thumbnail      *multipart.FileHeader `json:"thumbnail" form:"thumbnail"`
 	About          string                `validate:"required" json:"about" form:"about"`
-	UrlFile        string                `json:"url_file" form:"url_file"`
+	UrlFile        *multipart.FileHeader `json:"url_file" form:"url_file"`
 	UrlVideo       string                `json:"url_video" form:"url_video"`
 	CategoryId     int                   `json:"category_id" form:"category_id"`
 	Tutorials      []Tutorials           `json:"tutorials" form:"tutorials"`

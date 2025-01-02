@@ -156,11 +156,11 @@ func (service *RecipeServiceImpl) Save(ctx context.Context, request dto.RecipeRe
 	}
 
 	// Mapping Author
-	author := &dto.AuthorResponses{
-		ID:    recipe.RecipeAuthorId,
-		Name:  recipe.RecipeAuthor.Name,
-		Photo: recipe.RecipeAuthor.Photo,
+	author, er := service.AuthorRepository.FindById(ctx, service.DB, request.RecipeAuthorId)
+	if er != nil {
+		return dto.RecipeResponseCreate{}, err
 	}
+	authorResponse := dto.ToAuthorResponse(author)
 
 	// Mapping Category
 	category, err := service.CategoryRepository.FindById(ctx, service.DB, request.CategoryId)
@@ -196,7 +196,7 @@ func (service *RecipeServiceImpl) Save(ctx context.Context, request dto.RecipeRe
 		UrlFile:              recipe.UrlFile,
 		UrlVideo:             recipe.UrlVideo,
 		RecipePhotosResponse: photos,
-		Author:               author,
+		Author:               &authorResponse,
 		RecipeTutorials:      tutorialsRes,
 	}
 	// Log response in JSON format
@@ -223,7 +223,6 @@ func (service *RecipeServiceImpl) Update(ctx context.Context, request dto.Recipe
 	recipe.Slug = newSlug
 	recipe.Name = request.Name
 	recipe.About = request.About
-	recipe.UrlFile = request.UrlFile
 	recipe.UrlVideo = request.UrlVideo
 	recipe.CategoryId = int64(request.CategoryId)
 	recipe.RecipeAuthorId = int64(request.RecipeAuthorId)
@@ -260,6 +259,22 @@ func (service *RecipeServiceImpl) Update(ctx context.Context, request dto.Recipe
 		// if err != nil {
 		// 	return dto.CategoryResponseDetail{}, err
 		// }
+	}
+
+	//memperbarui file recipes
+	if request.UrlFile != nil {
+		// Proses UrlFile
+		var urlFileFilename string
+		if request.UrlFile != nil {
+			urlFileFilename = uuid.New().String() + "-" + recipe.Name + "." +
+				strings.Split(request.UrlFile.Filename, ".")[len(strings.Split(request.UrlFile.Filename, "."))-1]
+			urlFilePath := filepath.Join(basePath, "files", "recipes", "file_recipes", urlFileFilename)
+
+			if err := saveFile(request.UrlFile, urlFilePath); err != nil {
+				return dto.RecipeResponseUpdate{}, fmt.Errorf("failed to save url file: %w", err)
+			}
+		}
+		recipe.UrlFile = urlFileFilename
 	}
 
 	if request.RecipePhotos != nil {

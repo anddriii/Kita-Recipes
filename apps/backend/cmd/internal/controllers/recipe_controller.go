@@ -121,6 +121,12 @@ func (controller *RecipeController) Update(c *fiber.Ctx) error {
 		})
 	}
 
+	// parse UrlFile
+	urlFile, err := c.FormFile("url_file")
+	if err == nil {
+		request.UrlFile = urlFile
+	}
+
 	request.ID = int64(id)
 	if err := c.BodyParser(&request); err != nil {
 		log.Printf("Error BodyParser: %v", err)
