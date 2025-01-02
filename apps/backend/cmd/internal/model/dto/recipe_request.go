@@ -7,7 +7,7 @@ type RecipeRequestCreate struct {
 	Slug           string                `json:"slug"`
 	Thumbnail      *multipart.FileHeader `validate:"required" json:"thumbnail"`
 	About          string                `validate:"required" json:"about"`
-	UrlFile        string                `json:"url_file"`
+	UrlFile        *multipart.FileHeader `json:"url_file"`
 	UrlVideo       string                `validate:"required" json:"url_video"`
 	CategoryId     int                   `json:"category_id"`
 	RecipeAuthorId int                   `json:"recipe_author_id"`

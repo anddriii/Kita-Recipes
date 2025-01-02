@@ -3,6 +3,8 @@ package controllers
 import (
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -44,8 +46,13 @@ func (controller *RecipeController) Create(c *fiber.Ctx) error {
 	request.Name = c.FormValue("name")
 	request.Slug = c.FormValue("slug")
 	request.About = c.FormValue("about")
-	request.UrlFile = c.FormValue("url_file")
 	request.UrlVideo = urlVideo
+
+	// parse UrlFile
+	urlFile, err := c.FormFile("url_file")
+	if err == nil {
+		request.UrlFile = urlFile
+	}
 
 	// Parse integer fields
 	categoryId, _ := strconv.Atoi(c.FormValue("category_id"))
@@ -223,4 +230,19 @@ func (controller *RecipeController) Delete(c *fiber.Ctx) error {
 	return c.Status(http.StatusOK).JSON(fiber.Map{
 		"message": "Recipe deleted successfully",
 	})
+}
+
+// handler untuk recipe file download
+func (controller *RecipeController) DownloadFile(c *fiber.Ctx) error {
+	fileName := c.Params("filename") // Ambil nama file dari URL
+
+	filePath := filepath.Join("../../../assets/files/recipes/file_recipes/", fileName)
+
+	if _, err := os.Stat(filePath); os.IsNotExist(err) {
+		return c.Status(http.StatusNotFound).JSON(fiber.Map{
+			"error": "File not found",
+		})
+	}
+
+	return c.SendFile(filePath)
 }

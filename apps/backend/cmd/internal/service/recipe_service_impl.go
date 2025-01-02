@@ -85,13 +85,25 @@ func (service *RecipeServiceImpl) Save(ctx context.Context, request dto.RecipeRe
 		photoFilenames = append(photoFilenames, photoFilename)
 	}
 
+	// Proses UrlFile
+	var urlFileFilename string
+	if request.UrlFile != nil {
+		urlFileFilename = uuid.New().String() + "-" + recipeName.Name + "." +
+			strings.Split(request.UrlFile.Filename, ".")[len(strings.Split(request.UrlFile.Filename, "."))-1]
+		urlFilePath := filepath.Join(basePath, "files", "recipes", "file_recipes", urlFileFilename)
+
+		if err := saveFile(request.UrlFile, urlFilePath); err != nil {
+			return dto.RecipeResponseCreate{}, fmt.Errorf("failed to save url file: %w", err)
+		}
+	}
+
 	// Simpan data Recipe ke DB
 	recipe := domain.Recipe{
 		Name:           request.Name,
 		Slug:           utils.Slugify(request.Name),
 		Thumbnail:      thumbnailFilename,
 		About:          request.About,
-		UrlFile:        request.UrlFile,
+		UrlFile:        urlFileFilename,
 		UrlVideo:       request.UrlVideo,
 		CategoryId:     int64(request.CategoryId),
 		RecipeAuthorId: int64(request.RecipeAuthorId),

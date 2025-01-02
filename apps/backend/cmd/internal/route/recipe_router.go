@@ -12,9 +12,21 @@ func RecipeRouter(app *fiber.App, recipeController *controllers.RecipeController
 		return c.Next()
 	})
 
-	recipeGroup.Post("/", recipeController.Create)
-	recipeGroup.Put("/:id", recipeController.Update)
-	recipeGroup.Get("/:id", recipeController.FindById)
+	//get all recipes
 	recipeGroup.Get("/", recipeController.FindAll)
+
+	//create recipe
+	recipeGroup.Post("/", recipeController.Create)
+
+	//update recipe
+	recipeGroup.Put("/:id", recipeController.Update)
+
+	//get recipe by id
+	recipeGroup.Get("/:id", recipeController.FindById)
+
+	//delete recipe
 	recipeGroup.Delete("/:id", recipeController.Delete)
+
+	//download file recipes
+	recipeGroup.Get("/file/:filename", recipeController.DownloadFile)
 }

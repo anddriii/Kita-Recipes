@@ -45,7 +45,7 @@ func TestRecipeSave(t *testing.T) {
 		Name:           "Cara bikin Es teh bpy Furiahayaaa 16",
 		Thumbnail:      fileHeader,
 		About:          "Makaron adalah",
-		UrlFile:        "makaron.pdf",
+		UrlFile:        fileHeader,
 		UrlVideo:       "ada",
 		CategoryId:     5,
 		RecipeAuthorId: 8,
