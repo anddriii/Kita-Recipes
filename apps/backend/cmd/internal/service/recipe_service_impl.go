@@ -526,10 +526,17 @@ func (service *RecipeServiceImpl) FindById(ctx context.Context, id int) (dto.Rec
 		})
 	}
 
-	var photos []*dto.RecipePhotos
-	for _, photo := range recipeDetail.RecipePhoto {
-		photos = append(photos, &dto.RecipePhotos{
-			ID: photo.ID,
+	// menampilkan recipes photos dari DB
+	photoses, err := service.RecipePhotoRepository.Show(ctx, service.DB, int(recipeDetail.ID))
+	if err != nil {
+		return dto.RecipeResponseDetail{}, err
+	}
+
+	var photos []*dto.RecipePhotosResponse
+	for _, photo := range photoses {
+		photos = append(photos, &dto.RecipePhotosResponse{
+			ID:   photo.ID,
+			Name: photo.Photo,
 		})
 	}
 

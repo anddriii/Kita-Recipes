@@ -124,7 +124,7 @@ func TestUpdateRecipe(t *testing.T) {
 		Slug:           initialRecipe.Slug,
 		Thumbnail:      fileHeader,
 		About:          "Semoga tidak error, pleasseeee",
-		UrlFile:        "Update file",
+		UrlFile:        fileHeader,
 		UrlVideo:       "update video",
 		CategoryId:     5,
 		RecipeAuthorId: 7,
