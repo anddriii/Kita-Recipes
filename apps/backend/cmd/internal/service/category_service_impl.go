@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"log"
 	"os"
@@ -39,32 +38,20 @@ func (service *CategoryServiceImpl) Create(ctx context.Context, request dto.Cate
 	if err != nil {
 		return dto.CategoryResponse{}, err
 	}
+	basePath, err := filepath.Abs("../../../assets/")
+	if err != nil {
+		return dto.CategoryResponse{}, err
+	}
 
 	categoryIcon := domain.Categories{
 		Name: request.Name,
 	}
 
-	filename := uuid.New().String() + "-" + categoryIcon.Name + "." + strings.Split(request.Icon.Filename, ".")[len(strings.Split(request.Icon.Filename, "."))-1]
-	if err := os.MkdirAll(filepath.Dir(filename), os.ModePerm); err != nil {
-		return dto.CategoryResponse{}, err
-	}
+	filename := uuid.New().String() + "-" + categoryIcon.Name + "." +
+		strings.Split(request.Icon.Filename, ".")[len(strings.Split(request.Icon.Filename, "."))-1]
+	iconPath := filepath.Join(basePath, "category_icon", filename)
 
-	file, err := request.Icon.Open()
-	if err != nil {
-		return dto.CategoryResponse{}, err
-	}
-
-	filePath := "storage/images/categories/" + filename
-	fmt.Printf("Creating file: %s\n", filePath)
-	out, err := os.Create(filePath)
-	if err != nil {
-		return dto.CategoryResponse{}, err
-	}
-	defer out.Close()
-
-	//salin foto ke penyimpanan
-	_, err = io.Copy(out, file)
-	if err != nil {
+	if err := saveFile(request.Icon, iconPath); err != nil {
 		return dto.CategoryResponse{}, err
 	}
 
