@@ -76,15 +76,15 @@ func (service *CategoryServiceImpl) Create(ctx context.Context, request dto.Cate
 }
 
 // Update implements CategoryService.
-func (service *CategoryServiceImpl) Update(ctx context.Context, request dto.CategoryRequest) (dto.CategoryResponseDetail, error) {
+func (service *CategoryServiceImpl) Update(ctx context.Context, request dto.CategoryRequest) (dto.CategoryResponse, error) {
 	err := service.Validate.Struct(request)
 	if err != nil {
-		return dto.CategoryResponseDetail{}, err
+		return dto.CategoryResponse{}, err
 	}
 
 	category, err := service.CategoryRepository.FindById(ctx, service.DB, int(request.ID))
 	if err != nil {
-		return dto.CategoryResponseDetail{}, err
+		return dto.CategoryResponse{}, err
 	}
 	newSlug := utils.Slugify(request.Name)
 	request.Slug = newSlug
@@ -93,7 +93,7 @@ func (service *CategoryServiceImpl) Update(ctx context.Context, request dto.Cate
 
 	basePath, err := filepath.Abs("../../../assets/")
 	if err != nil {
-		return dto.CategoryResponseDetail{}, fmt.Errorf("gagal mendapatkan path: %w", err)
+		return dto.CategoryResponse{}, fmt.Errorf("gagal mendapatkan path: %w", err)
 	}
 
 	if request.Icon != nil {
@@ -104,7 +104,7 @@ func (service *CategoryServiceImpl) Update(ctx context.Context, request dto.Cate
 		iconPath := filepath.Join(basePath, "category_icon", filename)
 
 		if err := utils.SaveFile(request.Icon, iconPath); err != nil {
-			return dto.CategoryResponseDetail{}, err
+			return dto.CategoryResponse{}, err
 		}
 
 		// Assign path foto baru ke author
@@ -118,14 +118,14 @@ func (service *CategoryServiceImpl) Update(ctx context.Context, request dto.Cate
 
 	if _, err := service.CategoryRepository.Update(ctx, service.DB, &category); err != nil {
 		log.Printf("Error saving category")
-		return dto.CategoryResponseDetail{}, err
+		return dto.CategoryResponse{}, err
 	}
 
-	return dto.CategoryResponseDetail{
-		ID:     category.ID,
-		Name:   category.Name,
-		Slug:   category.Slug,
-		Recipe: []*dto.RecipeResponses{},
+	return dto.CategoryResponse{
+		ID:   category.ID,
+		Name: category.Name,
+		Slug: category.Slug,
+		Icon: category.Icon,
 	}, nil
 
 }
