@@ -2,9 +2,8 @@ package service
 
 import (
 	"context"
-	"io"
+	"fmt"
 	"log"
-	"os"
 	"path/filepath"
 	"strings"
 
@@ -51,7 +50,7 @@ func (service *CategoryServiceImpl) Create(ctx context.Context, request dto.Cate
 		strings.Split(request.Icon.Filename, ".")[len(strings.Split(request.Icon.Filename, "."))-1]
 	iconPath := filepath.Join(basePath, "category_icon", filename)
 
-	if err := saveFile(request.Icon, iconPath); err != nil {
+	if err := utils.SaveFile(request.Icon, iconPath); err != nil {
 		return dto.CategoryResponse{}, err
 	}
 
@@ -92,28 +91,19 @@ func (service *CategoryServiceImpl) Update(ctx context.Context, request dto.Cate
 	category.Slug = newSlug
 	category.Name = request.Name
 
+	basePath, err := filepath.Abs("../../../assets/")
+	if err != nil {
+		return dto.CategoryResponseDetail{}, fmt.Errorf("gagal mendapatkan path: %w", err)
+	}
+
 	if request.Icon != nil {
 		// Generate nama file baru
 		filename := uuid.New().String() + "-" + category.Name + "." +
 			strings.Split(request.Icon.Filename, ".")[len(strings.Split(request.Icon.Filename, "."))-1]
 
-		// Buka file yang di-upload
-		file, err := request.Icon.Open()
-		if err != nil {
-			return dto.CategoryResponseDetail{}, err
-		}
-		defer file.Close()
+		iconPath := filepath.Join(basePath, "category_icon", filename)
 
-		// Simpan file ke direktori
-		filePath := "storage/images/" + filename
-		out, err := os.Create(filePath)
-		if err != nil {
-			return dto.CategoryResponseDetail{}, err
-		}
-		defer out.Close()
-
-		_, err = io.Copy(out, file)
-		if err != nil {
+		if err := utils.SaveFile(request.Icon, iconPath); err != nil {
 			return dto.CategoryResponseDetail{}, err
 		}
 

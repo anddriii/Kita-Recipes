@@ -13,4 +13,5 @@ func CategoryRouter(app *fiber.App, categoryController *controllers.CategoryCont
 	})
 
 	categoryGroup.Post("/", categoryController.Create)
+	categoryGroup.Put("/:id", categoryController.Update)
 }
