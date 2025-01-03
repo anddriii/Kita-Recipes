@@ -12,6 +12,19 @@ func CategoryRouter(app *fiber.App, categoryController *controllers.CategoryCont
 		return c.Next()
 	})
 
+	//get all category
+	categoryGroup.Get("/", categoryController.FindAll)
+
+	//create category
 	categoryGroup.Post("/", categoryController.Create)
+
+	// Update category
 	categoryGroup.Put("/:id", categoryController.Update)
+
+	//Find by Id category
+	categoryGroup.Get("/:id", categoryController.FindById)
+
+	//Delete category
+	categoryGroup.Delete("/:id", categoryController.Delete)
+
 }

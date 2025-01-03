@@ -78,3 +78,48 @@ func (controller *CategoryController) Update(c *fiber.Ctx) error {
 
 	return c.Status(http.StatusCreated).JSON(response)
 }
+
+func (controller *CategoryController) FindById(c *fiber.Ctx) error {
+	id, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid ID",
+		})
+	}
+
+	response, err := controller.CategoryService.FindById(c.Context(), id)
+	if err != nil {
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.Status(http.StatusOK).JSON(response)
+
+}
+
+func (controller *CategoryController) FindAll(c *fiber.Ctx) error {
+	response, err := controller.CategoryService.FindAll(c.Context())
+	if err != nil {
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.Status(http.StatusOK).JSON(response)
+}
+
+func (controller *CategoryController) Delete(c *fiber.Ctx) error {
+	id, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid ID",
+		})
+	}
+
+	controller.CategoryService.Delete(c.Context(), id)
+
+	return c.Status(http.StatusOK).JSON(fiber.Map{
+		"message": "Category deleted successfully",
+	})
+}
