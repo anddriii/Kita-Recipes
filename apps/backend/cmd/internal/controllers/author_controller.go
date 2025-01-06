@@ -1,7 +1,9 @@
 package controllers
 
 import (
+	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/anddriii/KitaRecipes/cmd/internal/model/dto"
 	"github.com/anddriii/KitaRecipes/cmd/internal/service"
@@ -31,6 +33,43 @@ func (controller *AuthorController) Create(c *fiber.Ctx) error {
 	request.Photo = photo
 
 	response, err := controller.AuthorService.Save(c.Context(), &request)
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.Status(http.StatusCreated).JSON(response)
+}
+
+func (controller *AuthorController) Update(c *fiber.Ctx) error {
+	photo, err := c.FormFile("photo")
+	if err != nil {
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"error": "photo is required",
+		})
+	}
+
+	var request dto.AuthorRequest
+	id, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid ID",
+		})
+	}
+
+	request.Photo = photo
+
+	request.ID = id
+
+	if err := c.BodyParser(&request); err != nil {
+		log.Printf("Error body parser: %v", err)
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	response, err := controller.AuthorService.Update(c.Context(), &request)
 	if err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),

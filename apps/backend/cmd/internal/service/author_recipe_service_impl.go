@@ -2,16 +2,14 @@ package service
 
 import (
 	"context"
-	"fmt"
-	"io"
 	"log"
-	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/anddriii/KitaRecipes/cmd/internal/model/domain"
 	"github.com/anddriii/KitaRecipes/cmd/internal/model/dto"
 	"github.com/anddriii/KitaRecipes/cmd/internal/repository"
+	"github.com/anddriii/KitaRecipes/utils"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
@@ -40,30 +38,18 @@ func (a *AuthorServiceImpl) Save(ctx context.Context, request *dto.AuthorRequest
 		return dto.AuthorResponses{}, err
 	}
 
+	basePath, err := filepath.Abs("../../../assets/")
+	if err != nil {
+		return dto.AuthorResponses{}, err
+	}
+
 	authorPhoto := domain.RecipeAuthor{
 		Name: request.Name,
 	}
 	filename := uuid.New().String() + "-" + authorPhoto.Name + "." + strings.Split(request.Photo.Filename, ".")[len(strings.Split(request.Photo.Filename, "."))-1]
-	if err := os.MkdirAll(filepath.Dir(filename), os.ModePerm); err != nil {
-		return dto.AuthorResponses{}, err
-	}
+	photoPath := filepath.Join(basePath, "author_photo", filename)
 
-	file, err := request.Photo.Open()
-	if err != nil {
-		return dto.AuthorResponses{}, err
-	}
-
-	filePath := "storage/images/" + filename
-	fmt.Printf("Creating file: %s\n", filePath)
-	out, err := os.Create(filePath)
-	if err != nil {
-		return dto.AuthorResponses{}, err
-	}
-	defer out.Close()
-
-	//salin foto ke penyimpanan
-	_, err = io.Copy(out, file)
-	if err != nil {
+	if err := utils.SaveFile(request.Photo, photoPath); err != nil {
 		return dto.AuthorResponses{}, err
 	}
 
@@ -98,31 +84,20 @@ func (a *AuthorServiceImpl) Update(ctx context.Context, request *dto.AuthorReque
 		return dto.AuthorResponseDetail{}, err
 	}
 
+	basePath, err := filepath.Abs("../../../assets/")
+	if err != nil {
+		return dto.AuthorResponseDetail{}, err
+	}
+
 	author.Name = request.Name
 
 	if request.Photo != nil {
 		// Generate nama file baru
 		filename := uuid.New().String() + "-" + author.Name + "." + strings.Split(request.Photo.Filename, ".")[len(strings.Split(request.Photo.Filename, "."))-1]
 
-		// Buka file yang di-upload
-		file, err := request.Photo.Open()
-		if err != nil {
-			log.Printf("Gagal open poto")
-			panic(err)
-		}
-		defer file.Close()
+		photoPath := filepath.Join(basePath, "author_photo", filename)
 
-		// Simpan file ke direktori
-		filePath := "storage/images/" + filename
-		fmt.Printf("Creating file: %s\n", filePath)
-		out, err := os.Create(filePath)
-		if err != nil {
-			return dto.AuthorResponseDetail{}, err
-		}
-		defer out.Close()
-
-		_, err = io.Copy(out, file)
-		if err != nil {
+		if err := utils.SaveFile(request.Photo, photoPath); err != nil {
 			return dto.AuthorResponseDetail{}, err
 		}
 

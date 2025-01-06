@@ -13,4 +13,5 @@ func AuthorRouter(app *fiber.App, authorController *controllers.AuthorController
 	})
 
 	authorGroup.Post("/", authorController.Create)
+	authorGroup.Put("/:id", authorController.Update)
 }
