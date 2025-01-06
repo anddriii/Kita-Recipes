@@ -8,7 +8,7 @@ import (
 func CategoryRouter(app *fiber.App, categoryController *controllers.CategoryController) {
 	categoryGroup := app.Group("categories")
 	app.Use(func(c *fiber.Ctx) error {
-		c.Set("Contenr-Type", "multipart/form-data")
+		c.Set("Content-Type", "multipart/form-data")
 		return c.Next()
 	})
 
