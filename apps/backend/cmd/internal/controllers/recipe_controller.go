@@ -196,6 +196,20 @@ func (controller *RecipeController) Update(c *fiber.Ctx) error {
 		request.RecipePhotos = photoUploads
 	}
 
+	ingredientIDsStr := c.FormValue("ingredient_ids") // Format: "1,2,3"
+	if ingredientIDsStr != "" {
+		ingredientIDList := strings.Split(ingredientIDsStr, ",")
+		for _, idStr := range ingredientIDList {
+			id, err := strconv.ParseInt(idStr, 10, 64)
+			if err != nil {
+				return c.Status(http.StatusBadRequest).JSON(fiber.Map{
+					"error": "Invalid ingredient_id format",
+				})
+			}
+			request.IngredinetIDs = append(request.IngredinetIDs, id)
+		}
+	}
+
 	response, err := controller.RecipeService.Update(c.Context(), request)
 	if err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{

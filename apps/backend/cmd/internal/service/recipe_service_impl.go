@@ -24,17 +24,19 @@ type RecipeServiceImpl struct {
 	RecipePhotoRepository repository.RecipePhotoRepository
 	AuthorRepository      repository.AuthorRepository
 	TutorialsRepository   repository.RecipeTutorials
+	RecipeIngredientRepo  repository.RecipeIngredientRepository
 	DB                    *gorm.DB
 	Validate              *validator.Validate
 }
 
-func NewRecipeService(recipeRepository repository.RecipeRespository, recipePhoto repository.RecipePhotoRepository, categoryRepository repository.CategoryRepository, authorRepository repository.AuthorRepository, tutorialsRepo repository.RecipeTutorials, DB *gorm.DB, validate *validator.Validate) RecipeService {
+func NewRecipeService(recipeRepository repository.RecipeRespository, recipePhoto repository.RecipePhotoRepository, categoryRepository repository.CategoryRepository, authorRepository repository.AuthorRepository, tutorialsRepo repository.RecipeTutorials, recipeIngredientRepo repository.RecipeIngredientRepository, DB *gorm.DB, validate *validator.Validate) RecipeService {
 	return &RecipeServiceImpl{
 		RecipeRepository:      recipeRepository,
 		CategoryRepository:    categoryRepository,
 		AuthorRepository:      authorRepository,
 		RecipePhotoRepository: recipePhoto,
 		TutorialsRepository:   tutorialsRepo,
+		RecipeIngredientRepo:  recipeIngredientRepo,
 		DB:                    DB,
 		Validate:              validate,
 	}
@@ -232,6 +234,7 @@ func (service *RecipeServiceImpl) Save(ctx context.Context, request dto.RecipeRe
 
 // Update implements RecipeService.
 func (service *RecipeServiceImpl) Update(ctx context.Context, request dto.RecipeRequestUpdate) (dto.RecipeResponseUpdate, error) {
+
 	err := service.Validate.Struct(request)
 	if err != nil {
 		return dto.RecipeResponseUpdate{}, err
@@ -242,6 +245,7 @@ func (service *RecipeServiceImpl) Update(ctx context.Context, request dto.Recipe
 		return dto.RecipeResponseUpdate{}, err
 	}
 
+	// update basic field
 	newSlug := utils.Slugify(request.Name)
 	request.Slug = newSlug
 	recipe.Slug = newSlug
@@ -257,6 +261,7 @@ func (service *RecipeServiceImpl) Update(ctx context.Context, request dto.Recipe
 			Name: t.Name,
 		})
 	}
+
 	// Path direktori utama
 	basePath, err := filepath.Abs("../../../assets/")
 	if err != nil {
@@ -337,6 +342,23 @@ func (service *RecipeServiceImpl) Update(ctx context.Context, request dto.Recipe
 		}
 	}
 
+	// update ingredients in junction table
+	if request.IngredinetIDs != nil {
+		// Hapus relasi lama ingredients
+		if err := service.RecipeIngredientRepo.DeleteByRecipeID(ctx, service.DB, int(request.ID)); err != nil {
+			return dto.RecipeResponseUpdate{}, fmt.Errorf("failed to delete old ingredients: %w", err)
+		}
+
+		// Tambahkan relasi baru ingredients
+		for _, ingredient := range request.IngredinetIDs {
+			err := service.RecipeIngredientRepo.Create(ctx, service.DB, int(recipe.ID), int(ingredient))
+			log.Printf("Recipe Ingredient: recipe.ID : %v", recipe.ID)
+			if err != nil {
+				return dto.RecipeResponseUpdate{}, fmt.Errorf("failed to associate ingredient: %w", err)
+			}
+		}
+	}
+
 	log.Println("recipe category id request", request.CategoryId)
 
 	recipeDetail, err := service.RecipeRepository.Update(ctx, service.DB, &recipe)
@@ -366,6 +388,17 @@ func (service *RecipeServiceImpl) Update(ctx context.Context, request dto.Recipe
 		})
 	}
 
+	//mapping ingredients response
+	ingredients, _ := service.RecipeIngredientRepo.GetIngredientsByRecipeId(ctx, service.DB, int(recipe.ID))
+	var ingredientResponses []*dto.IngredientResponse
+	for _, ingredient := range ingredients {
+		ingredientResponses = append(ingredientResponses, &dto.IngredientResponse{
+			ID:    ingredient.ID,
+			Name:  ingredient.Name,
+			Photo: ingredient.Photo,
+		})
+	}
+
 	// Mapping Author
 	author, err := service.AuthorRepository.FindById(ctx, service.DB, request.RecipeAuthorId)
 	if err != nil {
@@ -373,16 +406,6 @@ func (service *RecipeServiceImpl) Update(ctx context.Context, request dto.Recipe
 	}
 	// author domain to author response
 	authorResponse := dto.ToAuthorResponse(author)
-
-	// Mapping Ingredients
-	var ingredients []*dto.IngredientResponse
-	for _, ingredient := range recipeDetail.Ingredients {
-		ingredients = append(ingredients, &dto.IngredientResponse{
-			ID:    ingredient.ID,
-			Name:  ingredient.Name,
-			Photo: ingredient.Photo,
-		})
-	}
 
 	//mapping tutorials
 	tutorialsDb, err := service.TutorialsRepository.Show(ctx, service.DB, int(recipe.ID))
@@ -410,7 +433,7 @@ func (service *RecipeServiceImpl) Update(ctx context.Context, request dto.Recipe
 		Thumbnail:        recipeDetail.Thumbnail,
 		About:            recipeDetail.About,
 		RecipeTutorials:  tutorialsRes,
-		Ingredients:      ingredients,
+		Ingredients:      ingredientResponses,
 		CategoryResponse: &categoryResponse,
 		Author:           &authorResponse,
 		RecipePhotos:     photos,

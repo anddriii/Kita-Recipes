@@ -76,7 +76,6 @@ func (repository *RecipeRespositoryImpl) Update(ctx context.Context, db *gorm.DB
 			"UrlVideo":       recipe.UrlVideo,
 			"CategoryId":     recipe.CategoryId,
 			"RecipeAuthorId": recipe.RecipeAuthorId,
-			"Ingredients":    recipe.Ingredients,
 		}).Error
 	if err != nil {
 		// Batalkan transaksi

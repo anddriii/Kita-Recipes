@@ -28,4 +28,5 @@ type RecipeRequestUpdate struct {
 	Tutorials      []Tutorials           `json:"tutorials" form:"tutorials"`
 	RecipeAuthorId int                   `json:"recipe_author_id" form:"recipe_author_id"`
 	RecipePhotos   []RecipePhotos        `json:"photos" form:"recipe_photos"`
+	IngredinetIDs  []int64
 }
