@@ -13,6 +13,7 @@ type RecipeRequestCreate struct {
 	RecipeAuthorId int                   `json:"recipe_author_id"`
 	RecipePhotos   []RecipePhotos        `json:"photos"`
 	Tutorials      []Tutorials           `json:"tutorials" form:"tutorials"`
+	IngredientIDs  []int64
 }
 
 type RecipeRequestUpdate struct {

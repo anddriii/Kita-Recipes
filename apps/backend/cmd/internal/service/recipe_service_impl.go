@@ -127,6 +127,19 @@ func (service *RecipeServiceImpl) Save(ctx context.Context, request dto.RecipeRe
 		}
 	}
 
+	// Simpan Ingredients ke Junction Table
+	if len(request.IngredientIDs) > 0 {
+		var ingredients []domain.Ingredient
+		if err := service.DB.Where("id IN ?", request.IngredientIDs).Find(&ingredients).Error; err != nil {
+			return dto.RecipeResponseCreate{}, fmt.Errorf("failed to find ingredients: %w", err)
+		}
+
+		// Hubungkan Recipe dengan Ingredients di junction table
+		if err := service.DB.Model(&recipe).Association("Ingredients").Append(ingredients); err != nil {
+			return dto.RecipeResponseCreate{}, fmt.Errorf("failed to associate ingredients: %w", err)
+		}
+	}
+
 	// Simpan RecipePhotos ke DB
 	for _, filename := range photoFilenames {
 		photo := domain.Photo{
@@ -182,6 +195,19 @@ func (service *RecipeServiceImpl) Save(ctx context.Context, request dto.RecipeRe
 			Name: tutorial.Name,
 		})
 	}
+	// mapping ingredients
+	var ingredients []domain.Ingredient
+	if err := service.DB.Model(&recipe).Association("Ingredients").Find(&ingredients); err != nil {
+		return dto.RecipeResponseCreate{}, fmt.Errorf("failed to fetch ingredients: %w", err)
+	}
+
+	var ingredientResponses []dto.IngredientResponse
+	for _, ingredient := range ingredients {
+		ingredientResponses = append(ingredientResponses, dto.IngredientResponse{
+			ID:   ingredient.ID,
+			Name: ingredient.Name,
+		})
+	}
 
 	response := dto.RecipeResponseCreate{
 		ID:                   recipe.ID,
@@ -195,6 +221,7 @@ func (service *RecipeServiceImpl) Save(ctx context.Context, request dto.RecipeRe
 		RecipePhotosResponse: photos,
 		Author:               &authorResponse,
 		RecipeTutorials:      tutorialsRes,
+		Ingredients:          ingredientResponses,
 	}
 	// Log response in JSON format
 	responseJSON, _ := json.MarshalIndent(response, "", "  ")

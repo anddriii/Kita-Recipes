@@ -91,6 +91,21 @@ func (controller *RecipeController) Create(c *fiber.Ctx) error {
 		}
 	}
 
+	// Parse Ingredient IDs
+	ingredientIDsStr := c.FormValue("ingredient_ids") // Format: "1,2,3"
+	if ingredientIDsStr != "" {
+		ingredientIDList := strings.Split(ingredientIDsStr, ",")
+		for _, idStr := range ingredientIDList {
+			id, err := strconv.ParseInt(idStr, 10, 64)
+			if err != nil {
+				return c.Status(http.StatusBadRequest).JSON(fiber.Map{
+					"error": "Invalid ingredient_id format",
+				})
+			}
+			request.IngredientIDs = append(request.IngredientIDs, id)
+		}
+	}
+
 	// Call Service Layer
 	response, err := controller.RecipeService.Save(c.Context(), request)
 	if err != nil {

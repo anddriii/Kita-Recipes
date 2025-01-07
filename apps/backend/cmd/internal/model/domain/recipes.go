@@ -15,6 +15,7 @@ type Recipe struct {
 	RecipeAuthorId int64
 	RecipeAuthor   RecipeAuthor     `gorm:"foreignKey:recipe_author_id;references:id"`
 	RecipePhoto    []Photo          `gorm:"foreignKey:recipe_id;references:id"`
+	Ingredients    []Ingredient     `gorm:"many2many:recipe_ingredients;foreignKey:id;joinForeignKey:recipe_id;References:ID;joinReferences:ingredient_id"`
 	UrlVideo       string           `json:"url_video"`
 	UrlFile        string           `json:"url_file"`
 	RecipeTutorial []RecipeTutorial `gorm:"foreignKey:recipe_id;references:id"`
