@@ -78,3 +78,20 @@ func (controller *AuthorController) Update(c *fiber.Ctx) error {
 
 	return c.Status(http.StatusCreated).JSON(response)
 }
+
+func (controller *AuthorController) FindById(c *fiber.Ctx) error {
+	id, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid ID",
+		})
+	}
+	response, err := controller.AuthorService.FindById(c.Context(), id)
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.Status(http.StatusOK).JSON(response)
+}

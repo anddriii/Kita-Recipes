@@ -12,6 +12,12 @@ func AuthorRouter(app *fiber.App, authorController *controllers.AuthorController
 		return c.Next()
 	})
 
+	// Create Author
 	authorGroup.Post("/", authorController.Create)
+
+	// Update Author
 	authorGroup.Put("/:id", authorController.Update)
+
+	//Find by Id
+	authorGroup.Get("/:id", authorController.FindById)
 }

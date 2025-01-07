@@ -26,7 +26,7 @@ func main() {
 	recipeController := controllers.NewRecipeController(recipeService)
 	categoryService := service.NewCategoryService(categoryRepo, db, validator)
 	categoryController := controllers.NewCategoryController(categoryService)
-	authorService := service.NewAuthorService(authorRepo, db, validator)
+	authorService := service.NewAuthorService(authorRepo, recipeRepo, db, validator)
 	authorController := controllers.NewAuthorController(authorService)
 
 	// Routes

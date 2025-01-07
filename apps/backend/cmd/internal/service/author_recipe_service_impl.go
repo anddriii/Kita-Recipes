@@ -18,13 +18,15 @@ import (
 
 type AuthorServiceImpl struct {
 	AuthorRepository repository.AuthorRepository
+	RecipeRepo       repository.RecipeRespository
 	DB               *gorm.DB
 	Validate         *validator.Validate
 }
 
-func NewAuthorService(authorRepository repository.AuthorRepository, DB *gorm.DB, validate *validator.Validate) AuthorService {
+func NewAuthorService(authorRepository repository.AuthorRepository, recipeRepo repository.RecipeRespository, DB *gorm.DB, validate *validator.Validate) AuthorService {
 	return &AuthorServiceImpl{
 		AuthorRepository: authorRepository,
+		RecipeRepo:       recipeRepo,
 		DB:               DB,
 		Validate:         validate,
 	}
@@ -73,20 +75,20 @@ func (a *AuthorServiceImpl) Save(ctx context.Context, request *dto.AuthorRequest
 }
 
 // Update implements AuthorService.
-func (a *AuthorServiceImpl) Update(ctx context.Context, request *dto.AuthorRequest) (dto.AuthorResponseDetail, error) {
+func (a *AuthorServiceImpl) Update(ctx context.Context, request *dto.AuthorRequest) (dto.AuthorResponses, error) {
 	err := a.Validate.Struct(request)
 	if err != nil {
-		return dto.AuthorResponseDetail{}, err
+		return dto.AuthorResponses{}, err
 	}
 
 	author, err := a.AuthorRepository.FindById(ctx, a.DB, request.ID)
 	if err != nil {
-		return dto.AuthorResponseDetail{}, err
+		return dto.AuthorResponses{}, err
 	}
 
 	basePath, err := filepath.Abs("../../../assets/")
 	if err != nil {
-		return dto.AuthorResponseDetail{}, err
+		return dto.AuthorResponses{}, err
 	}
 
 	author.Name = request.Name
@@ -98,7 +100,7 @@ func (a *AuthorServiceImpl) Update(ctx context.Context, request *dto.AuthorReque
 		photoPath := filepath.Join(basePath, "author_photo", filename)
 
 		if err := utils.SaveFile(request.Photo, photoPath); err != nil {
-			return dto.AuthorResponseDetail{}, err
+			return dto.AuthorResponses{}, err
 		}
 
 		// Assign path foto baru ke author
@@ -106,21 +108,20 @@ func (a *AuthorServiceImpl) Update(ctx context.Context, request *dto.AuthorReque
 
 		// err = os.Remove("storage/images" + author.Photo)
 		// if err != nil {
-		// 	return dto.AuthorResponseDetail{}, err
+		// 	return dto.AuthorResponses{}, err
 		// }
 
 	}
 
 	if _, err := a.AuthorRepository.Update(ctx, a.DB, &author); err != nil {
 		log.Printf("Error saving author:")
-		return dto.AuthorResponseDetail{}, err
+		return dto.AuthorResponses{}, err
 	}
 
-	return dto.AuthorResponseDetail{
-		ID:      author.ID,
-		Name:    author.Name,
-		Photo:   author.Photo,
-		Recipes: []*dto.RecipeResponses{},
+	return dto.AuthorResponses{
+		ID:    author.ID,
+		Name:  author.Name,
+		Photo: author.Photo,
 	}, nil
 }
 
@@ -159,11 +160,26 @@ func (a *AuthorServiceImpl) FindById(ctx context.Context, id int) (dto.AuthorRes
 		return dto.AuthorResponseDetail{}, err
 	}
 
+	recipeRepo, err := a.RecipeRepo.RecipeAuthor(ctx, a.DB, int(authorDetail.ID))
+	if err != nil {
+		return dto.AuthorResponseDetail{}, err
+	}
+
+	var recipes []*dto.RecipeResponseDetail
+	for _, recipe := range recipeRepo {
+		recipes = append(recipes, &dto.RecipeResponseDetail{
+			ID:        recipe.ID,
+			Name:      recipe.Name,
+			Thumbnail: recipe.Thumbnail,
+			About:     recipe.About,
+		})
+	}
+
 	response := dto.AuthorResponseDetail{
 		ID:      authorDetail.ID,
 		Name:    authorDetail.Name,
 		Photo:   authorDetail.Photo,
-		Recipes: []*dto.RecipeResponses{},
+		Recipes: recipes,
 	}
 	return response, nil
 }
