@@ -136,9 +136,14 @@ func (repository *RecipeRespositoryImpl) FindAll(ctx context.Context, db *gorm.D
 
 func (repository *RecipeRespositoryImpl) RecipeAuthor(ctx context.Context, db *gorm.DB, id int) ([]domain.Recipe, error) {
 	var recipe []domain.Recipe
-	err := db.WithContext(ctx).Preload("Ingredients").Preload("Category").Where("recipe_author_id = ?", id).Find(&recipe).Error
+	err := db.WithContext(ctx).Preload("RecipeAuthor").Where("recipe_author_id = ?", id).Find(&recipe).Error
 	if err != nil {
 		return recipe, err
 	}
 	return recipe, nil
 }
+
+// func (repository *RecipeRespositoryImpl) CategoryForAuthor(ctx context.Context, db *gorm.DB, id int) (domain.Categories, error) {
+// 	var category domain.Categories
+// 	err := db.WithContext(ctx).Where("")
+// }

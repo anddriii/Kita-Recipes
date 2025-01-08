@@ -45,9 +45,9 @@ func (repository *CategoryRepositoryImpl) Delete(ctx context.Context, db *gorm.D
 
 func (repository *CategoryRepositoryImpl) FindById(ctx context.Context, db *gorm.DB, id int) (domain.CategoryDetail, error) {
 	var category domain.CategoryDetail
-	err := db.WithContext(ctx).Preload("Recipes").Where("id = ?", id).First(&category).Error
+	err := db.WithContext(ctx).Preload("Recipes").Where("id = ?", id).Find(&category).Error
 	if err != nil {
-		panic(err)
+		return category, err
 	}
 	return category, nil
 }
@@ -59,4 +59,18 @@ func (repository *CategoryRepositoryImpl) FindAll(ctx context.Context, db *gorm.
 		panic(err)
 	}
 	return categories, nil
+}
+
+func (repository *CategoryRepositoryImpl) FindByIds(ctx context.Context, db *gorm.DB, ids []int) (map[int]domain.CategoryDetail, error) {
+	var categories []domain.CategoryDetail
+	err := db.WithContext(ctx).Where("id IN ?", ids).Find(&categories).Error
+	if err != nil {
+		return nil, err
+	}
+
+	categoryMap := make(map[int]domain.CategoryDetail)
+	for _, category := range categories {
+		categoryMap[int(category.ID)] = category
+	}
+	return categoryMap, nil
 }

@@ -14,4 +14,7 @@ type CategoryRepository interface {
 	Delete(ctx context.Context, db *gorm.DB, category *domain.CategoryDetail) error
 	FindById(ctx context.Context, db *gorm.DB, id int) (domain.CategoryDetail, error)
 	FindAll(ctx context.Context, db *gorm.DB) ([]domain.Categories, error)
+
+	// untuk menampilkan category pada response author
+	FindByIds(ctx context.Context, db *gorm.DB, ids []int) (map[int]domain.CategoryDetail, error)
 }

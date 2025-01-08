@@ -19,14 +19,16 @@ import (
 type AuthorServiceImpl struct {
 	AuthorRepository repository.AuthorRepository
 	RecipeRepo       repository.RecipeRespository
+	CategoryRepo     repository.CategoryRepository
 	DB               *gorm.DB
 	Validate         *validator.Validate
 }
 
-func NewAuthorService(authorRepository repository.AuthorRepository, recipeRepo repository.RecipeRespository, DB *gorm.DB, validate *validator.Validate) AuthorService {
+func NewAuthorService(authorRepository repository.AuthorRepository, recipeRepo repository.RecipeRespository, categoryRepo repository.CategoryRepository, DB *gorm.DB, validate *validator.Validate) AuthorService {
 	return &AuthorServiceImpl{
 		AuthorRepository: authorRepository,
 		RecipeRepo:       recipeRepo,
+		CategoryRepo:     categoryRepo,
 		DB:               DB,
 		Validate:         validate,
 	}
@@ -165,13 +167,31 @@ func (a *AuthorServiceImpl) FindById(ctx context.Context, id int) (dto.AuthorRes
 		return dto.AuthorResponseDetail{}, err
 	}
 
-	var recipes []*dto.RecipeResponseDetail
+	//mapping category
+	// Collect all category IDs
+	var categoryIDs []int
 	for _, recipe := range recipeRepo {
-		recipes = append(recipes, &dto.RecipeResponseDetail{
-			ID:        recipe.ID,
-			Name:      recipe.Name,
-			Thumbnail: recipe.Thumbnail,
-			About:     recipe.About,
+		categoryIDs = append(categoryIDs, int(recipe.CategoryId))
+	}
+
+	// Load all categories in one query
+	categories, err := a.CategoryRepo.FindByIds(ctx, a.DB, categoryIDs)
+	if err != nil {
+		return dto.AuthorResponseDetail{}, err
+	}
+
+	// Map recipes with their respective categories
+	var recipes []*dto.RecipeResponseAuthor
+	for _, recipe := range recipeRepo {
+		category := categories[int(recipe.CategoryId)]
+		categoryResponse := dto.ToCategoryResponse(category)
+
+		recipes = append(recipes, &dto.RecipeResponseAuthor{
+			ID:               recipe.ID,
+			Name:             recipe.Name,
+			Thumbnail:        recipe.Thumbnail,
+			About:            recipe.About,
+			CategoryResponse: &categoryResponse,
 		})
 	}
 

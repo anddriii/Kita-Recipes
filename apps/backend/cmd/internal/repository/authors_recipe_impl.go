@@ -47,7 +47,7 @@ func (repository *AuthorRepositoryImpl) Delete(ctx context.Context, db *gorm.DB,
 
 func (repository *AuthorRepositoryImpl) FindById(ctx context.Context, db *gorm.DB, id int) (domain.RecipeAuthorDetail, error) {
 	var author domain.RecipeAuthorDetail
-	err := db.WithContext(ctx).First(&author, "id = ?", id).Error
+	err := db.WithContext(ctx).Preload("Recipes").First(&author, "id = ?", id).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return domain.RecipeAuthorDetail{}, fmt.Errorf("author with ID %d not found", id)

@@ -58,3 +58,11 @@ type RecipeResponseCreate struct {
 	RecipeTutorials      []*Tutorials            `json:"tutorials"`
 	Ingredients          []IngredientResponse    `json:"ingredients"`
 }
+
+type RecipeResponseAuthor struct {
+	ID               int64             `validate:"required" json:"id"`
+	Name             string            `validate:"required" json:"name"`
+	Thumbnail        string            `validate:"required" json:"thumbnail"`
+	About            string            `validate:"required" json:"about"`
+	CategoryResponse *CategoryResponse `json:"category"`
+}
