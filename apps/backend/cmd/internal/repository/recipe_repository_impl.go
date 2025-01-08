@@ -143,7 +143,12 @@ func (repository *RecipeRespositoryImpl) RecipeAuthor(ctx context.Context, db *g
 	return recipe, nil
 }
 
-// func (repository *RecipeRespositoryImpl) CategoryForAuthor(ctx context.Context, db *gorm.DB, id int) (domain.Categories, error) {
-// 	var category domain.Categories
-// 	err := db.WithContext(ctx).Where("")
-// }
+func (repository *RecipeRespositoryImpl) GetRecipeCategory(ctx context.Context, db *gorm.DB, id int) ([]domain.Recipe, error) {
+	var recipe []domain.Recipe
+	err := db.WithContext(ctx).Where("category_id = ?", id).Find(&recipe).Error
+	if err != nil {
+		return recipe, err
+	}
+
+	return recipe, nil
+}

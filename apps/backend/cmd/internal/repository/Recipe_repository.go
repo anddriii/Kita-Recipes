@@ -15,4 +15,5 @@ type RecipeRespository interface {
 	FindById(ctx context.Context, db *gorm.DB, id int) (domain.RecipeDetail, error)
 	FindAll(ctx context.Context, db *gorm.DB) ([]domain.RecipeDetail, error)
 	RecipeAuthor(ctx context.Context, db *gorm.DB, id int) ([]domain.Recipe, error)
+	GetRecipeCategory(ctx context.Context, db *gorm.DB, id int) ([]domain.Recipe, error)
 }

@@ -24,7 +24,7 @@ func main() {
 	recipeIngredient := repository.NewRecipeIngredients()
 	recipeService := service.NewRecipeService(recipeRepo, recipePhotoRepository, categoryRepo, authorRepo, tutorialRepo, recipeIngredient, db, validator)
 	recipeController := controllers.NewRecipeController(recipeService)
-	categoryService := service.NewCategoryService(categoryRepo, db, validator)
+	categoryService := service.NewCategoryService(categoryRepo, recipeRepo, db, validator)
 	categoryController := controllers.NewCategoryController(categoryService)
 	authorService := service.NewAuthorService(authorRepo, recipeRepo, categoryRepo, db, validator)
 	authorController := controllers.NewAuthorController(authorService)

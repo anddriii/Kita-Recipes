@@ -66,3 +66,11 @@ type RecipeResponseAuthor struct {
 	About            string            `validate:"required" json:"about"`
 	CategoryResponse *CategoryResponse `json:"category"`
 }
+
+type RecipeResponseCategory struct {
+	ID        int64  `validate:"required" json:"id"`
+	Name      string `validate:"required" json:"name"`
+	Slug      string
+	Thumbnail string `validate:"required" json:"thumbnail"`
+	About     string `validate:"required" json:"about"`
+}

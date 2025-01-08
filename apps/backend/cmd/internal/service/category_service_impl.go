@@ -19,13 +19,15 @@ import (
 
 type CategoryServiceImpl struct {
 	CategoryRepository repository.CategoryRepository
+	RecipeRepo         repository.RecipeRespository
 	DB                 *gorm.DB
 	Validate           *validator.Validate
 }
 
-func NewCategoryService(categoryRepository repository.CategoryRepository, DB *gorm.DB, validate *validator.Validate) CategoryService {
+func NewCategoryService(categoryRepository repository.CategoryRepository, recipeRepo repository.RecipeRespository, DB *gorm.DB, validate *validator.Validate) CategoryService {
 	return &CategoryServiceImpl{
 		CategoryRepository: categoryRepository,
+		RecipeRepo:         recipeRepo,
 		DB:                 DB,
 		Validate:           validate,
 	}
@@ -165,12 +167,29 @@ func (service *CategoryServiceImpl) FindById(ctx context.Context, id int) (dto.C
 		return dto.CategoryResponseDetail{}, err
 	}
 
+	//mapping recipes
+	recipeRepo, err := service.RecipeRepo.GetRecipeCategory(ctx, service.DB, int(categoryDetail.ID))
+	if err != nil {
+		return dto.CategoryResponseDetail{}, err
+	}
+
+	var recipes []*dto.RecipeResponseCategory
+	for _, recipe := range recipeRepo {
+		recipes = append(recipes, &dto.RecipeResponseCategory{
+			ID:        recipe.ID,
+			Name:      recipe.Name,
+			Slug:      recipe.Slug,
+			Thumbnail: recipe.Thumbnail,
+			About:     recipe.About,
+		})
+	}
+
 	response := dto.CategoryResponseDetail{
 		ID:     categoryDetail.ID,
 		Name:   categoryDetail.Name,
 		Slug:   categoryDetail.Slug,
 		Icon:   categoryDetail.Icon,
-		Recipe: []*dto.RecipeResponses{},
+		Recipe: recipes,
 	}
 
 	return response, err

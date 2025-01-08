@@ -8,9 +8,9 @@ type CategoryResponse struct {
 }
 
 type CategoryResponseDetail struct {
-	ID     int64              `json:"id"`
-	Name   string             `json:"name"`
-	Icon   string             `json:"icon"`
-	Slug   string             `json:"slug"`
-	Recipe []*RecipeResponses `json:"recipes"`
+	ID     int64                     `json:"id"`
+	Name   string                    `json:"name"`
+	Icon   string                    `json:"icon"`
+	Slug   string                    `json:"slug"`
+	Recipe []*RecipeResponseCategory `json:"recipes"`
 }
