@@ -20,4 +20,10 @@ func AuthorRouter(app *fiber.App, authorController *controllers.AuthorController
 
 	//Find by Id
 	authorGroup.Get("/:id", authorController.FindById)
+
+	//get all author
+	authorGroup.Get("/", authorController.FindAll)
+
+	//Delete author
+	authorGroup.Delete("/:id", authorController.Delete)
 }

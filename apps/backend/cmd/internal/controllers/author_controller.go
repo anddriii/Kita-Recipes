@@ -43,12 +43,7 @@ func (controller *AuthorController) Create(c *fiber.Ctx) error {
 }
 
 func (controller *AuthorController) Update(c *fiber.Ctx) error {
-	photo, err := c.FormFile("photo")
-	if err != nil {
-		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
-			"error": "photo is required",
-		})
-	}
+	photo, _ := c.FormFile("photo")
 
 	var request dto.AuthorRequest
 	id, err := strconv.Atoi(c.Params("id"))
@@ -79,6 +74,17 @@ func (controller *AuthorController) Update(c *fiber.Ctx) error {
 	return c.Status(http.StatusCreated).JSON(response)
 }
 
+func (controller *AuthorController) FindAll(c *fiber.Ctx) error {
+	response, err := controller.AuthorService.FindAll(c.Context())
+	if err != nil {
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.Status(http.StatusOK).JSON(response)
+}
+
 func (controller *AuthorController) FindById(c *fiber.Ctx) error {
 	id, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
@@ -94,4 +100,18 @@ func (controller *AuthorController) FindById(c *fiber.Ctx) error {
 	}
 
 	return c.Status(http.StatusOK).JSON(response)
+}
+
+func (controller *AuthorController) Delete(c *fiber.Ctx) error {
+	id, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid",
+		})
+	}
+
+	controller.AuthorService.Delete(c.Context(), id)
+	return c.Status(http.StatusOK).JSON(fiber.Map{
+		"message": "Author Deleted Succesfully",
+	})
 }

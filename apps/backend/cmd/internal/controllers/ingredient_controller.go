@@ -86,3 +86,28 @@ func (controller *IngredientController) FindById(c *fiber.Ctx) error {
 
 	return c.Status(http.StatusOK).JSON(response)
 }
+
+func (controller *IngredientController) FindAll(c *fiber.Ctx) error {
+	response, err := controller.IngredientService.FindAll(c.Context())
+	if err != nil {
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.Status(http.StatusOK).JSON(response)
+}
+
+func (controller *IngredientController) Delete(c *fiber.Ctx) error {
+	id, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid ID",
+		})
+	}
+
+	controller.IngredientService.Delete(c.Context(), id)
+	return c.Status(http.StatusOK).JSON(fiber.Map{
+		"message": "Ingredient deleted succesfully",
+	})
+}
