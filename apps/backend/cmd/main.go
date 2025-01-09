@@ -28,11 +28,15 @@ func main() {
 	categoryController := controllers.NewCategoryController(categoryService)
 	authorService := service.NewAuthorService(authorRepo, recipeRepo, categoryRepo, db, validator)
 	authorController := controllers.NewAuthorController(authorService)
+	ingredientRepo := repository.NewIngredientRepository()
+	ingredientService := service.NewIngredientService(ingredientRepo, db, validator)
+	ingredientController := controllers.NewIngredientController(ingredientService)
 
 	// Routes
 	router.RecipeRouter(app, recipeController)
 	router.CategoryRouter(app, categoryController)
 	router.AuthorRouter(app, authorController)
+	router.IngredientRouter(app, ingredientController)
 
 	// Start Server
 	app.Listen(":3000")
