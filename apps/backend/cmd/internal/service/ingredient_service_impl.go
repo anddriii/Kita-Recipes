@@ -2,17 +2,14 @@ package service
 
 import (
 	"context"
-	"errors"
-	"fmt"
-	"io"
 	"log"
-	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/anddriii/KitaRecipes/cmd/internal/model/domain"
 	"github.com/anddriii/KitaRecipes/cmd/internal/model/dto"
 	"github.com/anddriii/KitaRecipes/cmd/internal/repository"
+	"github.com/anddriii/KitaRecipes/utils"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
@@ -41,37 +38,20 @@ func (service *IngredientServiceImpl) Save(ctx context.Context, request *dto.Ing
 		return dto.IngredientResponse{}, err
 	}
 
+	//base path
+	basePath, err := filepath.Abs("../../../assets/")
+	if err != nil {
+		return dto.IngredientResponse{}, err
+	}
+
 	ingredientPhoto := domain.Ingredient{
 		Name: request.Name,
 	}
 	filename := uuid.New().String() + "-" + ingredientPhoto.Name + "." + strings.Split(request.Photo.Filename, ".")[len(strings.Split(request.Photo.Filename, "."))-1]
-	if err := os.MkdirAll(filepath.Dir(filename), os.ModePerm); err != nil {
-		return dto.IngredientResponse{}, err
-	}
+	photoPath := filepath.Join(basePath, "ingredient_photo", filename)
 
-	file, err := request.Photo.Open()
-	if err != nil {
+	if err := utils.SaveFile(request.Photo, photoPath); err != nil {
 		return dto.IngredientResponse{}, err
-	}
-
-	filePath := "storage/images/ingredients/" + filename
-	if err := os.MkdirAll(filepath.Dir("storage/images/ingredients/"), os.ModePerm); err != nil {
-		return dto.IngredientResponse{}, err
-	}
-	fmt.Printf("Creating file: %s\n", filePath)
-	out, err := os.Create(filePath)
-	if err != nil {
-		return dto.IngredientResponse{}, err
-	}
-	defer out.Close()
-
-	//salin foto ke penyimpanan
-	_, err = io.Copy(out, file)
-	if err != nil {
-		return dto.IngredientResponse{}, err
-	}
-	if request.Photo == nil {
-		return dto.IngredientResponse{}, errors.New("PHOTO IS REQUIRED")
 	}
 
 	ingredient := &domain.Ingredient{
@@ -100,6 +80,12 @@ func (service *IngredientServiceImpl) Update(ctx context.Context, request *dto.I
 		return dto.IngredientResponse{}, err
 	}
 
+	//base path
+	basePath, err := filepath.Abs("../../../assets/")
+	if err != nil {
+		return dto.IngredientResponse{}, err
+	}
+
 	log.Printf("Retrieving ingredient with ID: %d", request.ID)
 	ingredient, err := service.IngredientRepository.FindById(ctx, service.DB, request.ID)
 	if err != nil {
@@ -113,28 +99,11 @@ func (service *IngredientServiceImpl) Update(ctx context.Context, request *dto.I
 		// Generate nama file baru
 		filename := uuid.New().String() + "-" + ingredient.Name + "." + strings.Split(request.Photo.Filename, ".")[len(strings.Split(request.Photo.Filename, "."))-1]
 
-		// Buka file yang di-upload
-		file, err := request.Photo.Open()
-		if err != nil {
-			log.Printf("Gagal open poto")
-			panic(err)
-		}
-		defer file.Close()
+		photoPath := filepath.Join(basePath, "ingredient_photo", filename)
 
-		// Simpan file ke direktori
-		filePath := "storage/images/ingredients/" + filename
-		fmt.Printf("Creating file: %s\n", filePath)
-		out, err := os.Create(filePath)
-		if err != nil {
+		if err := utils.SaveFile(request.Photo, photoPath); err != nil {
 			return dto.IngredientResponse{}, err
 		}
-		defer out.Close()
-
-		_, err = io.Copy(out, file)
-		if err != nil {
-			return dto.IngredientResponse{}, err
-		}
-
 		// Assign path foto baru ke author
 		ingredient.Photo = filename
 

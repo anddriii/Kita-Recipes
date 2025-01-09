@@ -41,6 +41,36 @@ func (controller *IngredientController) Create(c *fiber.Ctx) error {
 	return c.Status(http.StatusCreated).JSON(response)
 }
 
+func (controller *IngredientController) Update(c *fiber.Ctx) error {
+	photo, _ := c.FormFile("photo")
+
+	var request dto.IngredientRequest
+	id, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid ID",
+		})
+	}
+
+	request.Photo = photo
+
+	request.ID = id
+	if err := c.BodyParser(&request); err != nil {
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	response, err := controller.IngredientService.Update(c.Context(), &request)
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.Status(http.StatusCreated).JSON(response)
+}
+
 func (controller *IngredientController) FindById(c *fiber.Ctx) error {
 	id, err := strconv.Atoi(c.Params("id"))
 	if err != nil {

@@ -15,6 +15,9 @@ func IngredientRouter(app *fiber.App, ingredientController *controllers.Ingredie
 	//create Ingredient
 	ingredinetGroup.Post("/", ingredientController.Create)
 
+	//update ingredient
+	ingredinetGroup.Put("/:id", ingredientController.Update)
+
 	//find By Id
 	ingredinetGroup.Get("/:id", ingredientController.FindById)
 }
