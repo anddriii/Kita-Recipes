@@ -206,8 +206,9 @@ func (service *RecipeServiceImpl) Save(ctx context.Context, request dto.RecipeRe
 	var ingredientResponses []dto.IngredientResponse
 	for _, ingredient := range ingredients {
 		ingredientResponses = append(ingredientResponses, dto.IngredientResponse{
-			ID:   ingredient.ID,
-			Name: ingredient.Name,
+			ID:    ingredient.ID,
+			Name:  ingredient.Name,
+			Photo: ingredient.Photo,
 		})
 	}
 
@@ -527,9 +528,14 @@ func (service *RecipeServiceImpl) FindById(ctx context.Context, id int) (dto.Rec
 	}
 
 	// Mapping Ingredients
-	var ingredients []*dto.IngredientResponse
-	for _, ingredient := range recipeDetail.Ingredients {
-		ingredients = append(ingredients, &dto.IngredientResponse{
+	var ingredients []domain.Ingredient
+	if err := service.DB.Model(&recipeDetail).Association("Ingredients").Find(&ingredients); err != nil {
+		return dto.RecipeResponseDetail{}, fmt.Errorf("failed to fetch ingredients: %w", err)
+	}
+
+	var ingredientResponses []dto.IngredientResponse
+	for _, ingredient := range ingredients {
+		ingredientResponses = append(ingredientResponses, dto.IngredientResponse{
 			ID:    ingredient.ID,
 			Name:  ingredient.Name,
 			Photo: ingredient.Photo,
@@ -568,7 +574,7 @@ func (service *RecipeServiceImpl) FindById(ctx context.Context, id int) (dto.Rec
 		Thumbnail:        recipeDetail.Thumbnail,
 		About:            recipeDetail.About,
 		RecipeTutorials:  tutorials,
-		Ingredients:      ingredients,
+		Ingredients:      ingredientResponses,
 		CategoryResponse: category,
 		Author:           author,
 		RecipePhotos:     photos,

@@ -24,7 +24,7 @@ type RecipeResponseDetail struct {
 	UrlVideo         string                  `validate:"required" json:"url_video"`
 	CategoryResponse *CategoryResponse       `json:"category"`
 	Author           *AuthorResponses        `json:"author"`
-	Ingredients      []*IngredientResponse   `json:"recipe_ingredient"`
+	Ingredients      []IngredientResponse    `json:"ingredients"`
 	RecipePhotos     []*RecipePhotosResponse `json:"photos"`
 	RecipeTutorials  []*Tutorials            `json:"tutorials"`
 }
