@@ -22,8 +22,9 @@ func TestCategorySave(t *testing.T) {
 
 	ctx := context.TODO()
 	validate := validator.New()
-	authorRepo := repository.NewCategoryRepository()
-	categoryService := service.NewCategoryService(authorRepo, db, validate)
+	catego := repository.NewCategoryRepository()
+	recipeRepo := repository.NewRecipeRepository()
+	service := service.NewCategoryService(catego, recipeRepo, db, validate)
 
 	// Pastikan direktori storage/images ada sebelum test
 	absolutePath, err := filepath.Abs("storage/images/categories/")
@@ -43,7 +44,7 @@ func TestCategorySave(t *testing.T) {
 	}
 
 	// Jalankan service Save
-	response, err := categoryService.Create(ctx, *request)
+	response, err := service.Create(ctx, *request)
 	require.NoError(t, err)
 	assert.Equal(t, "Changli istri saya", response.Name)
 }
@@ -54,7 +55,8 @@ func TestUpdateCategory(t *testing.T) {
 	validate := validator.New()
 
 	repo := repository.NewCategoryRepository()
-	service := service.NewCategoryService(repo, db, validate)
+	recipeRepo := repository.NewRecipeRepository()
+	service := service.NewCategoryService(repo, recipeRepo, db, validate)
 
 	var initialCategory domain.Categories
 	result := db.Where("id = ?", 10).First(&initialCategory)
@@ -94,7 +96,8 @@ func TestFindAllCategory(t *testing.T) {
 
 	validate := validator.New()
 	repo := repository.NewCategoryRepository()
-	service := service.NewCategoryService(repo, db, validate)
+	recipeRepo := repository.NewRecipeRepository()
+	service := service.NewCategoryService(repo, recipeRepo, db, validate)
 
 	ctx := context.Background()
 	authors, err := service.FindAll(ctx)
@@ -107,7 +110,8 @@ func TestFindByIdCategory(t *testing.T) {
 	db := SetupTestDB()
 	validate := validator.New()
 	repo := repository.NewCategoryRepository()
-	service := service.NewCategoryService(repo, db, validate)
+	recipeRepo := repository.NewRecipeRepository()
+	service := service.NewCategoryService(repo, recipeRepo, db, validate)
 
 	ctx := context.Background()
 	author, err := service.FindById(ctx, 18)
@@ -120,8 +124,8 @@ func TestDeleteCategory(t *testing.T) {
 	db := SetupTestDB()
 	validate := validator.New()
 	repo := repository.NewCategoryRepository()
-	service := service.NewCategoryService(repo, db, validate)
-
+	recipeRepo := repository.NewRecipeRepository()
+	service := service.NewCategoryService(repo, recipeRepo, db, validate)
 	ctx := context.Background()
 	service.Delete(ctx, 7)
 

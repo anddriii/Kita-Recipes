@@ -71,7 +71,9 @@ func TestAuthorService_Save_SuccessWithDB(t *testing.T) {
 	ctx := context.TODO()
 	validate := validator.New()
 	authorRepo := repository.NewAuthorRepository()
-	authorService := service.NewAuthorService(authorRepo, db, validate)
+	recipe := repository.NewRecipeRepository()
+	catego := repository.NewCategoryRepository()
+	authorService := service.NewAuthorService(authorRepo, recipe, catego, db, validate)
 
 	// Pastikan direktori storage/images ada sebelum test
 	absolutePath, err := filepath.Abs("storage/images/")
@@ -109,7 +111,9 @@ func TestAuthorService_Update(t *testing.T) {
 	validate := validator.New()
 
 	repo := repository.NewAuthorRepository()
-	authorService := service.NewAuthorService(repo, db, validate)
+	recipe := repository.NewRecipeRepository()
+	catego := repository.NewCategoryRepository()
+	authorService := service.NewAuthorService(repo, recipe, catego, db, validate)
 
 	// Seed initial data
 	initialAuthor := domain.RecipeAuthor{
@@ -143,10 +147,12 @@ func TestFindAllAuthor(t *testing.T) {
 
 	validate := validator.New()
 	repo := repository.NewAuthorRepository()
-	service := service.NewAuthorService(repo, db, validate)
+	recipe := repository.NewRecipeRepository()
+	catego := repository.NewCategoryRepository()
+	authorService := service.NewAuthorService(repo, recipe, catego, db, validate)
 
 	ctx := context.Background()
-	authors, err := service.FindAll(ctx)
+	authors, err := authorService.FindAll(ctx)
 
 	assert.NoError(t, err)
 	fmt.Println(authors)
@@ -156,10 +162,12 @@ func TestFindByIdAuthor(t *testing.T) {
 	db := SetupTestDB()
 	validate := validator.New()
 	repo := repository.NewAuthorRepository()
-	service := service.NewAuthorService(repo, db, validate)
+	recipe := repository.NewRecipeRepository()
+	catego := repository.NewCategoryRepository()
+	authorService := service.NewAuthorService(repo, recipe, catego, db, validate)
 
 	ctx := context.Background()
-	author, err := service.FindById(ctx, 1)
+	author, err := authorService.FindById(ctx, 1)
 
 	assert.NoError(t, err)
 	fmt.Println(author)
@@ -169,10 +177,12 @@ func TestDeleteAuthor(t *testing.T) {
 	db := SetupTestDB()
 	validate := validator.New()
 	repo := repository.NewAuthorRepository()
-	service := service.NewAuthorService(repo, db, validate)
+	recipe := repository.NewRecipeRepository()
+	catego := repository.NewCategoryRepository()
+	authorService := service.NewAuthorService(repo, recipe, catego, db, validate)
 
 	ctx := context.Background()
-	service.Delete(ctx, 9)
+	authorService.Delete(ctx, 9)
 
 	var author domain.RecipeAuthor
 	result := db.First(&author, 9)
