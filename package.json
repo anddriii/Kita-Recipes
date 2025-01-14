@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "start:backend": "cd apps/backend && go run main.go",
+    "start:backend": "cd apps/backend/cmd && go run main.go",
     "start:frontend": "nx serve frontend",
     "start": "concurrently \"npm run start:backend\" \"npm run start:frontend\""
   },

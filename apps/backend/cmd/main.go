@@ -8,10 +8,12 @@ import (
 	"github.com/anddriii/KitaRecipes/cmd/internal/service"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
 func main() {
 	app := fiber.New()
+	app.Use(cors.New())
 
 	// Database & Dependency Injection
 	db := model.OpenConnection() // Fungsi untuk koneksi database
