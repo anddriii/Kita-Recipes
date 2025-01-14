@@ -5,5 +5,17 @@
   "projectType": "application",
   "tags": [],
   "// targets": "to see all targets run: nx show project frontend --web",
-  "targets": {}
+  "targets": {
+    "build": {
+      "executor": "@nrwl/web:build",
+      "options": {
+        "outputPath": "dist/apps/frontend",
+        "index": "apps/frontend/public/index.html",
+        "main": "apps/frontend/src/main.tsx",
+        "tsConfig": "apps/frontend/tsconfig.app.json",
+        "assets": ["apps/frontend/public"],
+        "styles": ["apps/frontend/src/styles.css"]
+      }
+    }
+  }
 }

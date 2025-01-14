@@ -1,17 +1,23 @@
-version: "3.8"
+version: '3.8'
 
 services:
-  app:
+  backend:
     build:
-      context: .
+      context: ./apps/backend
       dockerfile: Dockerfile
     ports:
-      - "8081:8080"  # Backend
-      - "4201:4200"  # Frontend
-    container_name: kita-recipes-app
+      - "8080:8080"
+    networks:
+      - kita-network
+
+  frontend:
+    build:
+      context: ./apps/frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
     networks:
       - kita-network
 
 networks:
   kita-network:
-    driver: bridge

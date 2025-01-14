@@ -282,13 +282,7 @@ func (service *RecipeServiceImpl) Update(ctx context.Context, request dto.Recipe
 			return dto.RecipeResponseUpdate{}, fmt.Errorf("failed to save thumbnail: %w", err)
 		}
 
-		// Assign path foto baru ke author
 		recipe.Thumbnail = filename
-
-		// err = os.Remove("storage/images" + category.Icon)
-		// if err != nil {
-		// 	return dto.CategoryResponseDetail{}, err
-		// }
 	}
 
 	//memperbarui file recipes
@@ -308,24 +302,18 @@ func (service *RecipeServiceImpl) Update(ctx context.Context, request dto.Recipe
 	}
 
 	if request.RecipePhotos != nil {
-		// Proses RecipePhotos
 		var photoFilenames []string
 		for _, photo := range request.RecipePhotos {
 			photoFilename := uuid.New().String() + "-" + recipe.Name + "." +
 				strings.Split(photo.Photo.Filename, ".")[len(strings.Split(photo.Photo.Filename, "."))-1]
 			photoPath := filepath.Join(basePath, "images", "recipes", "recipes_photos", photoFilename)
-
-			log.Println("Saving photo to:", photoPath) // Debug log
-
+			log.Println("Saving photo to:", photoPath)
 			if err := utils.SaveFile(&photo.Photo, photoPath); err != nil {
-
 				return dto.RecipeResponseUpdate{}, fmt.Errorf("failed to save photo: %w", err)
 			}
 			photoFilenames = append(photoFilenames, photoFilename)
 		}
 
-		// Simpan foto ke database sekali saja
-		log.Println("Attempting to save photos in bulk")
 		if err := service.RecipePhotoRepository.Update(ctx, service.DB, int(request.ID), photoFilenames); err != nil {
 			log.Printf("Failed to save photos: %v", err)
 			return dto.RecipeResponseUpdate{}, err
@@ -400,7 +388,7 @@ func (service *RecipeServiceImpl) Update(ctx context.Context, request dto.Recipe
 		})
 	}
 
-	// Mapping Author
+	// Mapping Author as
 	author, err := service.AuthorRepository.FindById(ctx, service.DB, request.RecipeAuthorId)
 	if err != nil {
 		return dto.RecipeResponseUpdate{}, err
@@ -580,7 +568,7 @@ func (service *RecipeServiceImpl) FindById(ctx context.Context, id int) (dto.Rec
 		RecipePhotos:     photos,
 	}
 
-	// Log response in JSON format
+	// Log response in JSON
 	responseJSON, _ := json.MarshalIndent(response, "", "  ")
 	log.Println(string(responseJSON))
 

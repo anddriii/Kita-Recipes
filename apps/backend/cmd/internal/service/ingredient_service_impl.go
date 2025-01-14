@@ -149,7 +149,7 @@ func (service *IngredientServiceImpl) FindById(ctx context.Context, ingredientId
 	return response, nil
 }
 
-// FindAll implements IngredientService.
+// FindAll implements IngredientService
 func (service *IngredientServiceImpl) FindAll(ctx context.Context) ([]dto.IngredientResponse, error) {
 	ingredients, err := service.IngredientRepository.FindAll(ctx, service.DB)
 	if err != nil {
