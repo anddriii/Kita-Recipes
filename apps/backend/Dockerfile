@@ -1,23 +1,37 @@
-# Gunakan image golang
-FROM golang:1.20
+# Stage 1: Install dependencies
+FROM golang:1.19-alpine as dependencies
 
-# Set working directory
 WORKDIR /app
 
 # Copy file go.mod dan go.sum
 COPY ./go.mod ./go.sum ./
 
-# Download dependencies
+# Download dependensi
 RUN go mod download
 
-# Copy seluruh kode backend
-COPY ./ ./
+# Stage 2: Build
+FROM golang:1.19-alpine as builder
 
-# Build binary file
+WORKDIR /app
+
+# Copy semua file dari stage sebelumnya
+COPY --from=dependencies /go/pkg /go/pkg
+
+# Copy sisa source code
+COPY . .
+
+# Build aplikasi
 RUN go build -o main ./cmd
 
-# Expose port untuk backend
+# Stage 3: Production
+FROM alpine:latest
+
+WORKDIR /root/
+
+# Copy hasil build dari stage sebelumnya
+COPY --from=builder /app/main .
+
+# Expose port 8080 untuk aplikasi Go
 EXPOSE 8080
 
-# Command untuk menjalankan aplikasi
 CMD ["./main"]

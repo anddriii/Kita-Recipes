@@ -15,7 +15,7 @@ services:
       context: ./apps/frontend
       dockerfile: Dockerfile
     ports:
-      - "3000:3000"
+      - "3000:80" # Mapping port lokal 3000 ke port 80 Nginx di container
     networks:
       - kita-network
 

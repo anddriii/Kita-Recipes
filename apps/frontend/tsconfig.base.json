@@ -14,7 +14,10 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@kita-recipes/frontend/*": ["apps/frontend/src/*"],
+      "@kita-recipes/backend/*": ["apps/backend/cmd/*"]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }
