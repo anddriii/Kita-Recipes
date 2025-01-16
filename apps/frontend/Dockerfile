@@ -1,16 +1,24 @@
 # Stage 1: Install dependencies
-FROM node:18-alpine as dependencies
+FROM node:18 as dependencies
+
 
 WORKDIR /app
 
 # Salin package.json dan package-lock.json untuk cache instalasi npm
 COPY package*.json ./
 
+# Hapus node_modules dan package-lock.json sebelum instalasi ulang
+RUN rm -rf node_modules package-lock.json && yarn install
+
+
 # Install dependencies
-RUN npm install --legacy-peer-deps
+RUN yarn install @rollup/rollup-linux-x64-gnu --legacy-peer-deps
+
+
 
 # Stage 2: Build
-FROM node:18-alpine as builder
+FROM node:18 as builder
+
 
 WORKDIR /app
 
