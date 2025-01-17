@@ -7,7 +7,7 @@
     },
     "servers": [
         {
-            "url": "http://localhost:3000"
+            "url": "http://localhost:3000/api"
         }
     ],
     "paths": {
@@ -692,6 +692,108 @@
                                             "type": "number"
                                         },
                                         "status":{
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/register/":{
+            "post":{
+                "tags": ["Logins API"],
+                "summary": "POST Regiter",
+                "description": "register user",
+                "requestBody":{
+                    "content": {
+                        "application/json":{
+                            "schema":{
+                                "type": "object",
+                                "properties": {
+                                    "name":{
+                                        "type": "string"
+                                    },
+                                    "photo":{
+                                        "type": "string"
+                                    },
+                                    "username":{
+                                        "type": "string"
+                                    },
+                                    "password":{
+                                        "type": "string"
+                                    },
+                                    "email":{
+                                        "type": "string"
+                                    },
+                                    "role":{
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201":{
+                        "description": "User Registered succesfully",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type": "object",
+                                    "properties": {
+                                        "status":{
+                                            "type": "string"
+                                        },
+                                        "message":{
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/login/":{
+            "post":{
+                "tags": ["Logins API"],
+                "summary": "Proses Login user",
+                "requestBody":{
+                    "content": {
+                        "application/json":{
+                            "schema":{
+                                "type": "object",
+                                "properties": {
+                                    "username":{
+                                        "type": "string"
+                                    },
+                                    "password":{
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200":{
+                        "description": "Login succesful",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type": "object",
+                                    "properties": {
+                                        "status":{
+                                            "type": "string"
+                                        },
+                                        "message":{
+                                            "type": "string"
+                                        },
+                                        "session_id":{
                                             "type": "string"
                                         }
                                     }
