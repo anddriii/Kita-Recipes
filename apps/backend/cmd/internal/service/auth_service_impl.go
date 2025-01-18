@@ -4,13 +4,17 @@ import (
 	"context"
 	"errors"
 	"os"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/anddriii/KitaRecipes/cmd/internal/model/domain"
 	"github.com/anddriii/KitaRecipes/cmd/internal/model/dto"
 	"github.com/anddriii/KitaRecipes/cmd/internal/repository"
+	"github.com/anddriii/KitaRecipes/utils"
 	"github.com/go-playground/validator/v10"
 	"github.com/golang-jwt/jwt"
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -69,10 +73,30 @@ func (a *AuthServiceImpl) Login(ctx context.Context, request dto.LoginDTO) (stri
 
 // Register implements AuthService.
 func (a *AuthServiceImpl) Register(ctx context.Context, request dto.RegisterDTO) error {
+	err := a.Validate.Struct(request)
+	if err != nil {
+		return err
+	}
+
+	basePath, err := filepath.Abs("../../../assets/")
+	if err != nil {
+		return err
+	}
+
+	authorPhoto := domain.RecipeAuthor{
+		Name: request.Name,
+	}
+
+	filename := uuid.New().String() + "-" + authorPhoto.Name + "." + strings.Split(request.Photo.Filename, ".")[len(strings.Split(request.Photo.Filename, "."))-1]
+	photoPath := filepath.Join(basePath, "author_photo", filename)
+	if err := utils.SaveFile(request.Photo, photoPath); err != nil {
+		return err
+	}
+
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return err
 	}
 
-	return a.AuthRepo.CreateUSer(ctx, a.DB, request.Name, request.Photo, request.Username, request.Email, string(hashedPassword), request.Role)
+	return a.AuthRepo.CreateUSer(ctx, a.DB, request.Name, filename, request.Username, request.Email, string(hashedPassword), request.Role)
 }

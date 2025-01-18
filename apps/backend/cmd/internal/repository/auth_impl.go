@@ -46,7 +46,7 @@ func (repo *AuthRepositoryImpl) CreateUSer(ctx context.Context, db *gorm.DB, nam
 // GetUserByName implements AuthRepo.
 func (repo *AuthRepositoryImpl) GetUserByName(ctx context.Context, db *gorm.DB, username string) (*domain.Login, error) {
 	var user domain.Login
-	err := db.WithContext(ctx).Preload("Author").Where("username = ", username).First(&user).Error
+	err := db.WithContext(ctx).Preload("Author").Where("username = ?", username).First(&user).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errors.New("user not found")
