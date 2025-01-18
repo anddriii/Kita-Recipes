@@ -21,7 +21,7 @@ func (repo *AuthRepositoryImpl) CreateUSer(ctx context.Context, db *gorm.DB, nam
 
 	//insert ke tabel author
 	author := domain.RecipeAuthor{Name: name, Photo: photo}
-	if err := tx.Create(&author).Error; err != nil {
+	if err := tx.WithContext(ctx).Create(&author).Error; err != nil {
 		tx.Rollback()
 		return err
 	}
@@ -46,7 +46,7 @@ func (repo *AuthRepositoryImpl) CreateUSer(ctx context.Context, db *gorm.DB, nam
 // GetUserByName implements AuthRepo.
 func (repo *AuthRepositoryImpl) GetUserByName(ctx context.Context, db *gorm.DB, username string) (*domain.Login, error) {
 	var user domain.Login
-	err := db.Preload("Author").Where("username = ", username).First(&user).Error
+	err := db.WithContext(ctx).Preload("Author").Where("username = ", username).First(&user).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errors.New("user not found")
