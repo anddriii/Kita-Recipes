@@ -465,26 +465,32 @@ func (service *RecipeServiceImpl) FindAll(ctx context.Context) ([]dto.RecipeResp
 			Slug: recipe.Category.Slug,
 			Icon: recipe.Category.Icon,
 		}
-		// Ambil semua RecipePhoto dari elemen ini
-		photos := []*dto.RecipePhotos{}
-		for _, photo := range recipe.RecipePhoto {
-			photos = append(photos, &dto.RecipePhotos{
-				ID: photo.ID,
-				// Photo: photo.Photo,
+
+		// menampilkan recipes photos dari DB
+		photoses, err := service.RecipePhotoRepository.Show(ctx, service.DB, int(recipe.ID))
+		if err != nil {
+			return []dto.RecipeResponses{}, err
+		}
+
+		var photos []*dto.RecipePhotosResponse
+		for _, photo := range photoses {
+			photos = append(photos, &dto.RecipePhotosResponse{
+				ID:   photo.ID,
+				Name: photo.Photo,
 			})
 		}
 
 		// Buat objek RecipeResponses
 		recipeResponses = append(recipeResponses, dto.RecipeResponses{
-			ID:               recipe.ID,
-			Name:             recipe.Name,
-			Slug:             recipe.Slug,
-			UrlFile:          recipe.UrlFile,
-			UrlVideo:         recipe.UrlVideo,
-			Thumbnail:        recipe.Thumbnail,
-			About:            recipe.About,
-			RecipePhotos:     photos,
-			CategoryResponse: category,
+			ID:                   recipe.ID,
+			Name:                 recipe.Name,
+			Slug:                 recipe.Slug,
+			UrlFile:              recipe.UrlFile,
+			UrlVideo:             recipe.UrlVideo,
+			Thumbnail:            recipe.Thumbnail,
+			About:                recipe.About,
+			RecipePhotosResponse: photos,
+			CategoryResponse:     category,
 		})
 	}
 	// Log response in JSON format

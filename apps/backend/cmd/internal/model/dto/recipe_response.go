@@ -9,8 +9,7 @@ type RecipeResponses struct {
 	UrlFile              string `json:"url_file"`
 	UrlVideo             string `validate:"required" json:"url_video"`
 	CategoryId           int
-	CategoryResponse     *CategoryResponse `json:"category"`
-	RecipePhotos         []*RecipePhotos
+	CategoryResponse     *CategoryResponse       `json:"category"`
 	RecipePhotosResponse []*RecipePhotosResponse `json:"photos"`
 }
 
