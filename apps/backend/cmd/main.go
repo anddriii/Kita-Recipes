@@ -1,6 +1,8 @@
 package main
 
 import (
+	"log"
+
 	"github.com/anddriii/KitaRecipes/cmd/internal/controllers"
 	"github.com/anddriii/KitaRecipes/cmd/internal/model"
 	"github.com/anddriii/KitaRecipes/cmd/internal/repository"
@@ -9,11 +11,16 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/joho/godotenv"
 )
 
 func main() {
 	app := fiber.New()
 	app.Use(cors.New())
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env")
+	}
 
 	// Database & Dependency Injection
 	db := model.OpenConnection() // Fungsi untuk koneksi database

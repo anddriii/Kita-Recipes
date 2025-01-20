@@ -2,6 +2,7 @@ package router
 
 import (
 	"github.com/anddriii/KitaRecipes/cmd/internal/controllers"
+	middleware "github.com/anddriii/KitaRecipes/cmd/internal/middlewares"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -22,10 +23,10 @@ func RecipeRouter(app *fiber.App, recipeController *controllers.RecipeController
 	recipeGroup.Put("/:id", recipeController.Update)
 
 	//get recipe by id
-	recipeGroup.Get("/:id", recipeController.FindById)
+	recipeGroup.Get("/:id", middleware.APIKEYMiddleware, recipeController.FindById)
 
 	//delete recipe
-	recipeGroup.Delete("/:id", recipeController.Delete)
+	recipeGroup.Delete("/:id", middleware.APIKEYMiddleware, recipeController.Delete)
 
 	//download file recipes
 	recipeGroup.Get("/file/:filename", recipeController.DownloadFile)
