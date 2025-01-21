@@ -8,6 +8,10 @@ import (
 
 func AuthRoutes(app *fiber.App, authController *controllers.AuthController) {
 	auth := app.Group("/auth")
+	app.Use(func(c *fiber.Ctx) error {
+		c.Set("Content-Type", "multipart/form-data")
+		return c.Next()
+	})
 
 	auth.Post("/register", authController.Register)
 	auth.Post("/login", authController.Login)

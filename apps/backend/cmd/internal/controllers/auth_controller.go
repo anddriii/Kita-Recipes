@@ -27,7 +27,21 @@ func (controller *AuthController) Register(c *fiber.Ctx) error {
 		})
 	}
 
-	err := controller.AuthService.Register(c.Context(), request)
+	request.Name = c.FormValue("name")
+	photo, _ := c.FormFile("photo")
+	request.Photo = photo
+	request.Username = c.FormValue("username")
+	request.Password = c.FormValue("password")
+	request.Email = c.FormValue("email")
+
+	if controller.AuthService == nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"status":  "error",
+			"message": "Internal server error",
+		})
+	}
+
+	err := controller.AuthService.Register(c.Context(), &request)
 	if err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
@@ -49,7 +63,10 @@ func (controller *AuthController) Login(c *fiber.Ctx) error {
 		})
 	}
 
-	token, err := controller.AuthService.Login(c.Context(), req)
+	req.Username = c.FormValue("username")
+	req.Password = c.FormValue("password")
+
+	token, err := controller.AuthService.Login(c.Context(), &req)
 	if err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
 			"error":   err.Error(),

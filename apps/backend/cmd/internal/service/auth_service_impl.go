@@ -51,7 +51,7 @@ func generateToken(user *domain.Login) (string, error) {
 }
 
 // Login implements AuthService.
-func (a *AuthServiceImpl) Login(ctx context.Context, request dto.LoginDTO) (string, error) {
+func (a *AuthServiceImpl) Login(ctx context.Context, request *dto.LoginDTO) (string, error) {
 	user, err := a.AuthRepo.GetUserByName(ctx, a.DB, request.Username)
 	if err != nil {
 		return "", errors.New("invalid username or password")
@@ -72,7 +72,7 @@ func (a *AuthServiceImpl) Login(ctx context.Context, request dto.LoginDTO) (stri
 }
 
 // Register implements AuthService.
-func (a *AuthServiceImpl) Register(ctx context.Context, request dto.RegisterDTO) error {
+func (a *AuthServiceImpl) Register(ctx context.Context, request *dto.RegisterDTO) error {
 	err := a.Validate.Struct(request)
 	if err != nil {
 		return err

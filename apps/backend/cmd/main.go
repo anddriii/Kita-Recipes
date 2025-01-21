@@ -40,12 +40,16 @@ func main() {
 	ingredientRepo := repository.NewIngredientRepository()
 	ingredientService := service.NewIngredientService(ingredientRepo, db, validator)
 	ingredientController := controllers.NewIngredientController(ingredientService)
+	authRepo := repository.NewAuthRepository()
+	authService := service.NewAuthService(authRepo, db, validator)
+	authController := controllers.NewAuthController(authService)
 
 	// Routes
 	router.RecipeRouter(app, recipeController)
 	router.CategoryRouter(app, categoryController)
 	router.AuthorRouter(app, authorController)
 	router.IngredientRouter(app, ingredientController)
+	router.AuthRoutes(app, authController)
 
 	// Start Server
 	app.Listen(":3000")

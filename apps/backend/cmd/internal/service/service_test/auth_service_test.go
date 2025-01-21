@@ -34,7 +34,7 @@ func TestCreateUser(t *testing.T) {
 		Role:     "admin",
 	}
 
-	err = authService.Register(ctx, request)
+	err = authService.Register(ctx, &request)
 	if err != nil {
 		return
 	}
@@ -53,7 +53,7 @@ func TestLogin(t *testing.T) {
 		Password: "rahasia",
 	}
 
-	response, err := authService.Login(ctx, request)
+	response, err := authService.Login(ctx, &request)
 	assert.Nil(t, err, "Gagal login")
 	fmt.Println(response)
 }
