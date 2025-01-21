@@ -19,7 +19,7 @@ func main() {
 	app.Use(cors.New())
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env")
+		log.Fatalf("Error loading .env: %v", err)
 	}
 
 	// Database & Dependency Injection

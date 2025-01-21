@@ -1,5 +1,5 @@
 # Stage 1: Install dependencies
-FROM golang:1.19-alpine as dependencies
+FROM golang:1.21-alpine AS dependencies
 
 WORKDIR /app
 
@@ -10,7 +10,7 @@ COPY ./go.mod ./go.sum ./
 RUN go mod download
 
 # Stage 2: Build
-FROM golang:1.19-alpine as builder
+FROM golang:1.21-alpine AS builder
 
 WORKDIR /app
 
@@ -19,6 +19,11 @@ COPY --from=dependencies /go/pkg /go/pkg
 
 # Copy sisa source code
 COPY . .
+COPY ./cmd/.env /root/.env
+
+
+
+
 
 # Build aplikasi
 RUN go build -o main ./cmd
