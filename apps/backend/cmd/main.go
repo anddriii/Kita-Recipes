@@ -17,7 +17,7 @@ import (
 func main() {
 	app := fiber.New()
 	app.Use(cors.New())
-	err := godotenv.Load()
+	err := godotenv.Load(".env")
 	if err != nil {
 		log.Fatalf("Error loading .env: %v", err)
 	}
@@ -52,5 +52,5 @@ func main() {
 	router.AuthRoutes(app, authController)
 
 	// Start Server
-	app.Listen(":3000")
+	app.Listen("0.0.0.0:8081")
 }

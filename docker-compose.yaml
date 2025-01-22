@@ -1,12 +1,36 @@
 version: '3.8'
 
 services:
+  database:
+    image: mysql:latest
+    container_name: kita-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: kita_recipes
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3308:3306"
+    volumes:
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - kita-network
+
   backend:
     build:
       context: ./apps/backend
       dockerfile: Dockerfile
     ports:
-      - "8080:8080"
+      - "8081:8081"
+    depends_on:
+      - database
+    environment:
+      DB_HOST: kita-db
+      DB_PORT: 3306
+      DB_USER: user
+      DB_PASSWORD: root
+      DB_NAME: kita_recipes
     networks:
       - kita-network
 
