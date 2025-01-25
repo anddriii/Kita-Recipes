@@ -41,7 +41,7 @@ func (repository *IngredientRepositoryImpl) Update(ctx context.Context, db *gorm
 func (repository *IngredientRepositoryImpl) Delete(ctx context.Context, db *gorm.DB, ingredient domain.Ingredient) error {
 	err := db.WithContext(ctx).Delete(&domain.Ingredient{}, ingredient.ID).Error
 	if err != nil {
-		panic(err)
+		return err
 	}
 	return err
 }
@@ -50,7 +50,7 @@ func (repository *IngredientRepositoryImpl) FindById(ctx context.Context, db *go
 	var ingredient domain.Ingredient
 	err := db.WithContext(ctx).First(&ingredient, id).Error
 	if err != nil {
-		panic(err)
+		return domain.Ingredient{}, err
 	}
 	return ingredient, nil
 }
@@ -59,7 +59,7 @@ func (repository *IngredientRepositoryImpl) FindAll(ctx context.Context, db *gor
 	var ingredients []domain.Ingredient
 	err := db.WithContext(ctx).Find(&ingredients).Error
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	return ingredients, nil
 }

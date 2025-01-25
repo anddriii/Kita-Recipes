@@ -111,7 +111,7 @@ func (repository *RecipeRespositoryImpl) Update(ctx context.Context, db *gorm.DB
 func (repository *RecipeRespositoryImpl) Delete(ctx context.Context, db *gorm.DB, recipe *domain.RecipeDetail) error {
 	err := db.WithContext(ctx).Delete(&domain.Recipe{}, recipe.ID).Error
 	if err != nil {
-		panic(err)
+		return err
 	}
 	return err
 }
@@ -129,7 +129,7 @@ func (repository *RecipeRespositoryImpl) FindAll(ctx context.Context, db *gorm.D
 	var recipes []domain.RecipeDetail
 	err := db.WithContext(ctx).Preload("RecipePhoto").Preload("Category").Find(&recipes).Error
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	return recipes, nil
 }

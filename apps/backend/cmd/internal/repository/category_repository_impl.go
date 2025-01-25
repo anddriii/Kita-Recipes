@@ -17,7 +17,7 @@ func NewCategoryRepository() CategoryRepository {
 func (repository *CategoryRepositoryImpl) Save(ctx context.Context, db *gorm.DB, category *domain.Categories) (domain.Categories, error) {
 	err := db.WithContext(ctx).Create(category).Error
 	if err != nil {
-		panic(err)
+		return domain.Categories{}, err
 	}
 	return *category, nil
 }
@@ -29,7 +29,7 @@ func (repository *CategoryRepositoryImpl) Update(ctx context.Context, db *gorm.D
 		Icon: category.Icon,
 	}).Error
 	if err != nil {
-		panic("Error Repo")
+		return domain.CategoryDetail{}, err
 	}
 
 	return *category, nil
@@ -38,7 +38,7 @@ func (repository *CategoryRepositoryImpl) Update(ctx context.Context, db *gorm.D
 func (repository *CategoryRepositoryImpl) Delete(ctx context.Context, db *gorm.DB, category *domain.CategoryDetail) error {
 	err := db.WithContext(ctx).Delete(&domain.Categories{}, category.ID).Error
 	if err != nil {
-		panic(err)
+		return err
 	}
 	return err
 }
@@ -56,7 +56,7 @@ func (repository *CategoryRepositoryImpl) FindAll(ctx context.Context, db *gorm.
 	var categories []domain.Categories
 	err := db.WithContext(ctx).Find(&categories).Error
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	return categories, nil
 }

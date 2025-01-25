@@ -20,7 +20,7 @@ func NewAuthorRepository() AuthorRepository {
 func (repository *AuthorRepositoryImpl) Save(ctx context.Context, db *gorm.DB, author *domain.RecipeAuthor) (domain.RecipeAuthor, error) {
 	err := db.WithContext(ctx).Create(author).Error
 	if err != nil {
-		panic(err)
+		return domain.RecipeAuthor{}, err
 	}
 	return *author, nil
 }
@@ -31,7 +31,7 @@ func (repository *AuthorRepositoryImpl) Update(ctx context.Context, db *gorm.DB,
 		Photo: author.Photo,
 	}).Error
 	if err != nil {
-		panic(err)
+		return domain.RecipeAuthorDetail{}, err
 	}
 
 	return *author, nil
@@ -40,7 +40,7 @@ func (repository *AuthorRepositoryImpl) Update(ctx context.Context, db *gorm.DB,
 func (repository *AuthorRepositoryImpl) Delete(ctx context.Context, db *gorm.DB, author *domain.RecipeAuthorDetail) error {
 	err := db.WithContext(ctx).Delete(&domain.RecipeAuthor{}, author.ID).Error
 	if err != nil {
-		panic(err)
+		return err
 	}
 	return err
 }
