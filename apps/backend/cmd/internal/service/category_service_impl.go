@@ -136,7 +136,7 @@ func (service *CategoryServiceImpl) Update(ctx context.Context, request dto.Cate
 func (service *CategoryServiceImpl) Delete(ctx context.Context, id int) {
 	category, err := service.CategoryRepository.FindById(ctx, service.DB, id)
 	if err != nil {
-		panic("Data tidak ditemukan")
+		return
 	}
 	service.CategoryRepository.Delete(ctx, service.DB, &category)
 }
@@ -145,7 +145,7 @@ func (service *CategoryServiceImpl) Delete(ctx context.Context, id int) {
 func (service *CategoryServiceImpl) FindAll(ctx context.Context) ([]dto.CategoryResponse, error) {
 	categories, err := service.CategoryRepository.FindAll(ctx, service.DB)
 	if err != nil {
-		panic("Data tidak ditemukan")
+		return []dto.CategoryResponse{}, err
 	}
 
 	var categoryResponses []dto.CategoryResponse
