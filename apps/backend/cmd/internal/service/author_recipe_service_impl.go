@@ -131,7 +131,7 @@ func (a *AuthorServiceImpl) Update(ctx context.Context, request *dto.AuthorReque
 func (a *AuthorServiceImpl) Delete(ctx context.Context, authorID int) {
 	author, err := a.AuthorRepository.FindById(ctx, a.DB, authorID)
 	if err != nil {
-		panic("Data tidak ditemukan")
+		return
 	}
 	a.AuthorRepository.Delete(ctx, a.DB, &author)
 }
@@ -140,7 +140,7 @@ func (a *AuthorServiceImpl) Delete(ctx context.Context, authorID int) {
 func (a *AuthorServiceImpl) FindAll(ctx context.Context) ([]dto.AuthorResponses, error) {
 	authors, err := a.AuthorRepository.FindAll(ctx, a.DB)
 	if err != nil {
-		panic("Data tidak ditemukan")
+		return []dto.AuthorResponses{}, err
 	}
 
 	var authorResponses []dto.AuthorResponses
