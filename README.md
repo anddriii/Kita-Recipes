@@ -32,6 +32,7 @@ npm run start
 2. Gorm: Object Relational Mapper for Go.
 3. Swagger: API documentation tool.
 4. Gofiber: Web framework for Go.
+5. JWT: For Token Autentication
 
 - Frontend
 1. React: JavaScript library for building user interfaces.

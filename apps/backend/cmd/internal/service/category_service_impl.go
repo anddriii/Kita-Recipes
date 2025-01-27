@@ -116,6 +116,7 @@ func (service *CategoryServiceImpl) Update(ctx context.Context, request dto.Cate
 		// if err != nil {
 		// 	return dto.CategoryResponseDetail{}, err
 		// }
+		//
 	}
 
 	if _, err := service.CategoryRepository.Update(ctx, service.DB, &category); err != nil {
