@@ -1,8 +1,5 @@
 # KitaRecipes
 
-<a alt="Kafka Logo" href="https://www.instagram.com/andristwan._/" target="_blank" rel="noreferrer"><img src="https://cdn3.emoji.gg/emojis/7873-kafkasmug.png" width="160"></a>
-
-You know who she is? Yeah, she's my wife. Hahaha Kidding.
 
 Kita Recipes is a web platform designed for sharing and discovering food recipes. With Kita Recipes, users can search for their desired recipes and share their own recipes for others to explore and use. Each recipe includes detailed instructions, videos, and files to ensure clarity and ease of use.
 
